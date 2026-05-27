@@ -77,11 +77,22 @@
       text-align: center;
       font-weight: bold;
     }
+    .queue-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.queue-icon {
+  width: 18px;
+  height: 18px;
+}
   </style>
 </head>
 <body>
 
-  <div class="card">
+<div class="card">
     <h1 id="storeName">Quán Mì</h1>
 
     <p>
@@ -118,90 +129,152 @@
 <script>
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD_hZDfeIR575b7n5Cshp1VRZg2y--raiw",
-  authDomain: "mykungfu-31485.firebaseapp.com",
-  databaseURL: "https://mykungfu-31485-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "mykungfu-31485",
-  storageBucket: "mykungfu-31485.firebasestorage.app",
-  messagingSenderId: "830853417821",
-  appId: "1:830853417821:web:f336fb6f4cc7660b7d36b4"
+
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_DOMAIN",
+  databaseURL: "YOUR_DB_URL",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_BUCKET",
+  messagingSenderId: "YOUR_ID",
+  appId: "YOUR_APP"
+
 };
 
 firebase.initializeApp(firebaseConfig);
+
 const db = firebase.database();
 
-const params = new URLSearchParams(window.location.search);
-const store = params.get('store') || 'kungfu1';
-
 const storeNames = {
-  kungfu1: 'Mì Kung Fu',
-  kungfu2: 'Mì Kung Fu 2',
-  kungfu3: 'Mì Kung Fu 3'
+  kungfu: 'Mì Kung Fu',
+  musan: 'Lẩu Musan'
 };
 
-const storeName = storeNames[store] || 'Quán Mì Kung Fu';
+const params = new URLSearchParams(window.location.search);
 
-document.getElementById('storeName').innerText = storeName;
+const store = params.get('store') || 'kungfu';
 
-const queueRef = db.ref('queues/' + store);
+document.getElementById('storeName').innerText =
+  storeNames[store];
+
+const today = new Date().toISOString().split('T')[0];
+
+const waitingRef =
+  db.ref(`queues/${today}/${store}/waiting`);
 
 function maskPhone(phone) {
+
   return '*******' + phone.slice(-3);
+
 }
 
-queueRef.on('value', snapshot => {
+waitingRef.on('value', snapshot => {
+
   const data = snapshot.val() || {};
-  const list = Object.values(data);
+
+  const list = Object.entries(data);
 
   const ul = document.getElementById('queueList');
+
   ul.innerHTML = '';
 
-  list.forEach(item => {
+  list.forEach(([id, item]) => {
+
     const li = document.createElement('li');
-    li.innerText = maskPhone(item.phone);
+
+    li.className = 'queue-item';
+
+    li.innerHTML = `
+      <img
+        src="guest icon.png"
+        class="queue-icon"
+      />
+
+      <span>
+        ${item.name} - ${maskPhone(item.phone)}
+      </span>
+    `;
+
     ul.appendChild(li);
+
   });
 
-  document.getElementById('count').innerText = list.length;
+  document.getElementById('count').innerText =
+    list.length;
+
 });
 
-const nameInput = document.getElementById('name');
-const phoneInput = document.getElementById('phone');
-const submitBtn = document.getElementById('submitBtn');
+const nameInput =
+  document.getElementById('name');
+
+const guestCountInput =
+  document.getElementById('guestCount');
+
+const phoneInput =
+  document.getElementById('phone');
+
+const submitBtn =
+  document.getElementById('submitBtn');
 
 function checkForm() {
+
   submitBtn.disabled = !(
+
     nameInput.value.trim() &&
+    guestCountInput.value.trim() &&
     phoneInput.value.trim()
+
   );
+
 }
 
 nameInput.addEventListener('input', checkForm);
+
+guestCountInput.addEventListener('input', checkForm);
+
 phoneInput.addEventListener('input', checkForm);
 
 submitBtn.addEventListener('click', async () => {
 
   const name = nameInput.value.trim();
-  const phone = phoneInput.value.trim();
 
-  await queueRef.push({
+  const guestCount =
+    guestCountInput.value.trim();
+
+  const phone =
+    phoneInput.value.trim();
+
+  await waitingRef.push({
+
     name,
+    guestCount,
     phone,
+
     createdAt: Date.now()
+
   });
 
   document.getElementById('success').innerText =
-    'Đăng ký xếp hàng thành công';
+    'Đăng ký đặt bàn thành công';
 
-  document.getElementById('menu').style.display = 'block';
+  document.getElementById('menu').style.display =
+    'block';
 
   nameInput.value = '';
+
+  guestCountInput.value = '';
+
   phoneInput.value = '';
 
   submitBtn.disabled = true;
+
 });
-document.getElementById('menuBtn').addEventListener('click', () => {
-  document.getElementById('menu').style.display = 'block';
+
+document.getElementById('menuBtn')
+.addEventListener('click', () => {
+
+  document.getElementById('menu').style.display =
+    'block';
+
 });
 </script>
 
