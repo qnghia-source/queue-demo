@@ -102,7 +102,11 @@ body {
 
 <div class="store-buttons" id="storeButtons"></div>
 
-<h2>Khách đang chờ</h2>
+<h2 id="waitingTitle">
+
+  Khách đang chờ: 0 lượt (0 khách)
+
+</h2>
 
 <div id="waitingList"></div>
 
@@ -217,8 +221,10 @@ waitingRef.on('value', snapshot => {
 
   div.innerHTML = '';
 
-  list.forEach(([id, item]) => {
+  let totalGuests = 0;
 
+  list.forEach(([id, item]) => {
+    totalGuests += Number(item.guestCount || 0);
     const row =
       document.createElement('div');
 
@@ -260,7 +266,12 @@ waitingRef.on('value', snapshot => {
     div.appendChild(row);
 
   });
+  document.getElementById('waitingTitle')
+.innerText =
 
+  `Khách đang chờ:
+   ${list.length} lượt
+   (${totalGuests} khách)`;
 });
 
 servedRef.on('value', snapshot => {
@@ -276,7 +287,7 @@ servedRef.on('value', snapshot => {
   div.innerHTML = '';
 
   list.forEach(([id, item]) => {
-
+    totalGuests += Number(item.guestCount || 0);	
     const row =
       document.createElement('div');
 
@@ -297,11 +308,6 @@ servedRef.on('value', snapshot => {
         ${item.phone}
 
         <br>
-
-        Đặt:
-        ${formatTime(item.createdAt)}
-
-        |
 
         Serve:
         ${formatTime(item.servedAt)}
@@ -328,7 +334,12 @@ servedRef.on('value', snapshot => {
     div.appendChild(row);
 
   });
+  document.getElementById('waitingTitle')
+.innerText =
 
+  `Khách đang chờ:
+   ${list.length} lượt
+   (${totalGuests} khách)`;
 });
 
 async function serveCustomer(
