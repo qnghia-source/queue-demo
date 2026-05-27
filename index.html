@@ -103,9 +103,9 @@
 
     <div id="success" class="success"></div>
 
-    <a class="menu-link" href="#menu">
-      Xem Menu
-    </a>
+<a class="menu-link" href="javascript:void(0)" id="menuBtn">
+  Xem Menu
+</a>
 
     <img
       id="menu"
@@ -131,7 +131,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 const params = new URLSearchParams(window.location.search);
-const store = params.get('store') || 'haibatrung';
+const store = params.get('store') || 'kungfu1';
 
 const storeNames = {
   kungfu1: 'Mì Kung Fu',
@@ -139,7 +139,7 @@ const storeNames = {
   kungfu3: 'Mì Kung Fu 3'
 };
 
-const storeName = storeNames[store] || 'Quán Mì';
+const storeName = storeNames[store] || 'Quán Mì Kung Fu';
 
 document.getElementById('storeName').innerText = storeName;
 
