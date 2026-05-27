@@ -5,10 +5,8 @@
 
 <meta charset="UTF-8">
 
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0"
->
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
 <title>Queue Admin</title>
 
@@ -51,7 +49,6 @@ body {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  background: #ddd;
 
 }
 
@@ -95,13 +92,6 @@ body {
 
 }
 
-.toggle-btn {
-
-  padding: 10px 14px;
-  cursor: pointer;
-
-}
-
 </style>
 
 </head>
@@ -110,16 +100,9 @@ body {
 
 <div class="card">
 
-<div
-  class="store-buttons"
-  id="storeButtons"
-></div>
+<div class="store-buttons" id="storeButtons"></div>
 
-<h2 id="waitingTitle">
-
-  Khách đang chờ: 0 (0)
-
-</h2>
+<h2>Khách đang chờ</h2>
 
 <div id="waitingList"></div>
 
@@ -127,19 +110,14 @@ body {
 
 <div class="card">
 
-<button
-  id="toggleServed"
-  class="toggle-btn"
->
+<button id="toggleServed">
 
-  Hiện danh sách đã phục vụ
+Hiện danh sách đã phục vụ
 
 </button>
 
-<div
-  id="servedWrapper"
-  style="display:none"
->
+<div id="servedWrapper"
+style="display:none">
 
 <h2>Đã phục vụ</h2>
 
@@ -170,7 +148,6 @@ const db = firebase.database();
 const storeNames = {
 
   kungfu: 'Mì Kung Fu',
-
   musan: 'Lẩu Musan'
 
 };
@@ -223,8 +200,8 @@ Object.entries(storeNames)
 
 function formatTime(ts) {
 
-  return new Date(Number(ts))
-    .toLocaleString('vi-VN');
+  return new Date(ts)
+    .toLocaleTimeString('vi-VN');
 
 }
 
@@ -240,12 +217,7 @@ waitingRef.on('value', snapshot => {
 
   div.innerHTML = '';
 
-  let totalGuests = 0;
-
   list.forEach(([id, item]) => {
-
-    totalGuests +=
-      Number(item.guestCount || 0);
 
     const row =
       document.createElement('div');
@@ -289,13 +261,6 @@ waitingRef.on('value', snapshot => {
 
   });
 
-  document.getElementById('waitingTitle')
-  .innerText =
-
-    `Khách đang chờ:
-     ${list.length}
-     (${totalGuests})`;
-
 });
 
 servedRef.on('value', snapshot => {
@@ -303,12 +268,7 @@ servedRef.on('value', snapshot => {
   const data = snapshot.val() || {};
 
   const list =
-    Object.entries(data)
-    .sort((a, b) =>
-
-      b[1].servedAt - a[1].servedAt
-
-    );
+    Object.entries(data);
 
   const div =
     document.getElementById('servedList');
