@@ -102,7 +102,11 @@ body {
 
 <div class="store-buttons" id="storeButtons"></div>
 
-<h2>Khách đang chờ</h2>
+<h2 id="waitingTitle">
+
+  Khách đang chờ
+
+</h2>
 
 <div id="waitingList"></div>
 
@@ -159,11 +163,9 @@ const currentStore =
 const today =
   new Date().toISOString().split('T')[0];
 
-const waitingRef =
-  db.ref(`queues/${today}/${currentStore}/waiting`);
+const queueRef =
+  db.ref(`queues/${today}/${currentStore}`);
 
-const servedRef =
-  db.ref(`queues/${today}/${currentStore}/served`);
 
 const storeButtons =
   document.getElementById('storeButtons');
@@ -196,26 +198,52 @@ Object.entries(storeNames)
 
 });
 
-function formatTime(ts) {
+function formatDateTime(ts) {
 
-  return new Date(ts)
-    .toLocaleTimeString('vi-VN');
+  if (!ts) return '';
+
+  return new Date(Number(ts))
+    .toLocaleString('vi-VN');
 
 }
 
-waitingRef.on('value', snapshot => {
+queueRef.on('value', snapshot => {
 
   const data = snapshot.val() || {};
 
-  const list =
+  const allList =
     Object.entries(data);
 
-  const div =
+  const waitingList =
+    allList
+      .filter(([id, item]) => !item.served)
+      .sort((a, b) =>
+        a[1].createdAt - b[1].createdAt
+      );
+
+  const servedList =
+    allList
+      .filter(([id, item]) => item.served)
+      .sort((a, b) =>
+        b[1].served - a[1].served
+      );
+
+  const waitingDiv =
     document.getElementById('waitingList');
 
-  div.innerHTML = '';
+  const servedDiv =
+    document.getElementById('servedList');
 
-  list.forEach(([id, item]) => {
+  waitingDiv.innerHTML = '';
+
+  servedDiv.innerHTML = '';
+
+  let totalGuests = 0;
+
+  waitingList.forEach(([id, item]) => {
+
+    totalGuests +=
+      Number(item.guestCount || 0);
 
     const row =
       document.createElement('div');
@@ -240,13 +268,7 @@ waitingRef.on('value', snapshot => {
 
       <button
         class="serve-btn"
-        onclick="serveCustomer(
-          '${id}',
-          '${item.name}',
-          '${item.guestCount}',
-          '${item.phone}',
-          '${item.createdAt}'
-        )"
+        onclick="serveCustomer('${id}')"
       >
 
         Serve
@@ -255,7 +277,62 @@ waitingRef.on('value', snapshot => {
 
     `;
 
-    div.appendChild(row);
+    waitingDiv.appendChild(row);
+
+  });
+
+  document.getElementById('waitingTitle')
+    .innerText =
+
+    `Khách đang chờ:
+     ${waitingList.length} lượt
+     (${totalGuests} khách)`;
+
+  servedList.forEach(([id, item]) => {
+
+    const row =
+      document.createElement('div');
+
+    row.className = 'row';
+
+    row.innerHTML = `
+
+      <div>
+
+        <strong>${item.name}</strong>
+
+        |
+
+        ${item.guestCount} khách
+
+        |
+
+        ${item.phone}
+
+        <br>
+
+        Đặt:
+        ${formatDateTime(item.createdAt)}
+
+        |
+
+        Serve:
+        ${formatDateTime(item.served)}
+
+      </div>
+
+      <button
+        class="restore-btn"
+        onclick="restoreCustomer('${id}')"
+      >
+
+        ↻
+
+      </button>
+
+    `;
+
+    servedDiv.appendChild(row);
 
   });
 
@@ -329,46 +406,27 @@ servedRef.on('value', snapshot => {
 
 });
 
-async function serveCustomer(
-  id,
-  name,
-  guestCount,
-  phone,
-  createdAt
-) {
+async function serveCustomer(id) {
 
-  await servedRef.push({
+  await queueRef
+    .child(id)
+    .update({
 
-    name,
-    guestCount,
-    phone,
-    createdAt,
-    servedAt: Date.now()
+      served: Date.now()
 
-  });
-
-  await waitingRef.child(id).remove();
+    });
 
 }
 
-async function restoreCustomer(
-  id,
-  name,
-  guestCount,
-  phone,
-  createdAt
-) {
+async function restoreCustomer(id) {
 
-  await waitingRef.push({
+  await queueRef
+    .child(id)
+    .update({
 
-    name,
-    guestCount,
-    phone,
-    createdAt
+      served: null
 
-  });
-
-  await servedRef.child(id).remove();
+    });
 
 }
 
