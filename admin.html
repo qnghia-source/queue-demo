@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Queue Admin</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<style>
+
+body {
+
+  font-family: Arial;
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+  background: #f5f5f5;
+
+}
+
+.card {
+
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+
+}
+
+.store-buttons {
+
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+
+}
+
+.store-btn {
+
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+
+}
+
+.active {
+
+  background: green;
+  color: white;
+
+}
+
+.row {
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+
+}
+
+.serve-btn {
+
+  background: green;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+
+}
+
+.restore-btn {
+
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<div class="store-buttons" id="storeButtons"></div>
+
+<h2>Khách đang chờ</h2>
+
+<div id="waitingList"></div>
+
+</div>
+
+<div class="card">
+
+<button id="toggleServed">
+
+Hiện danh sách đã phục vụ
+
+</button>
+
+<div id="servedWrapper"
+style="display:none">
+
+<h2>Đã phục vụ</h2>
+
+<div id="servedList"></div>
+
+</div>
+
+</div>
+
+<script>
+
+const firebaseConfig = {
+
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_DOMAIN",
+  databaseURL: "YOUR_DB_URL",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_BUCKET",
+  messagingSenderId: "YOUR_ID",
+  appId: "YOUR_APP"
+
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.database();
+
+const storeNames = {
+
+  kungfu: 'Mì Kung Fu',
+  musan: 'Lẩu Musan'
+
+};
+
+const params =
+  new URLSearchParams(window.location.search);
+
+const currentStore =
+  params.get('store') || 'kungfu';
+
+const today =
+  new Date().toISOString().split('T')[0];
+
+const waitingRef =
+  db.ref(`queues/${today}/${currentStore}/waiting`);
+
+const servedRef =
+  db.ref(`queues/${today}/${currentStore}/served`);
+
+const storeButtons =
+  document.getElementById('storeButtons');
+
+Object.entries(storeNames)
+.forEach(([key, name]) => {
+
+  const btn =
+    document.createElement('button');
+
+  btn.className =
+    'store-btn';
+
+  if (key === currentStore) {
+
+    btn.classList.add('active');
+
+  }
+
+  btn.innerText = name;
+
+  btn.onclick = () => {
+
+    window.location =
+      `admin.html?store=${key}`;
+
+  };
+
+  storeButtons.appendChild(btn);
+
+});
+
+function formatTime(ts) {
+
+  return new Date(ts)
+    .toLocaleTimeString('vi-VN');
+
+}
+
+waitingRef.on('value', snapshot => {
+
+  const data = snapshot.val() || {};
+
+  const list =
+    Object.entries(data);
+
+  const div =
+    document.getElementById('waitingList');
+
+  div.innerHTML = '';
+
+  list.forEach(([id, item]) => {
+
+    const row =
+      document.createElement('div');
+
+    row.className = 'row';
+
+    row.innerHTML = `
+
+      <div>
+
+        <strong>${item.name}</strong>
+
+        |
+
+        ${item.guestCount} khách
+
+        |
+
+        ${item.phone}
+
+      </div>
+
+      <button
+        class="serve-btn"
+        onclick="serveCustomer(
+          '${id}',
+          '${item.name}',
+          '${item.guestCount}',
+          '${item.phone}',
+          '${item.createdAt}'
+        )"
+      >
+
+        Serve
+
+      </button>
+
+    `;
+
+    div.appendChild(row);
+
+  });
+
+});
+
+servedRef.on('value', snapshot => {
+
+  const data = snapshot.val() || {};
+
+  const list =
+    Object.entries(data);
+
+  const div =
+    document.getElementById('servedList');
+
+  div.innerHTML = '';
+
+  list.forEach(([id, item]) => {
+
+    const row =
+      document.createElement('div');
+
+    row.className = 'row';
+
+    row.innerHTML = `
+
+      <div>
+
+        <strong>${item.name}</strong>
+
+        |
+
+        ${item.guestCount} khách
+
+        |
+
+        ${item.phone}
+
+        <br>
+
+        Đặt:
+        ${formatTime(item.createdAt)}
+
+        |
+
+        Serve:
+        ${formatTime(item.servedAt)}
+
+      </div>
+
+      <button
+        class="restore-btn"
+        onclick="restoreCustomer(
+          '${id}',
+          '${item.name}',
+          '${item.guestCount}',
+          '${item.phone}',
+          '${item.createdAt}'
+        )"
+      >
+
+        ↻
+
+      </button>
+
+    `;
+
+    div.appendChild(row);
+
+  });
+
+});
+
+async function serveCustomer(
+  id,
+  name,
+  guestCount,
+  phone,
+  createdAt
+) {
+
+  await servedRef.push({
+
+    name,
+    guestCount,
+    phone,
+    createdAt,
+    servedAt: Date.now()
+
+  });
+
+  await waitingRef.child(id).remove();
+
+}
+
+async function restoreCustomer(
+  id,
+  name,
+  guestCount,
+  phone,
+  createdAt
+) {
+
+  await waitingRef.push({
+
+    name,
+    guestCount,
+    phone,
+    createdAt
+
+  });
+
+  await servedRef.child(id).remove();
+
+}
+
+document.getElementById('toggleServed')
+.onclick = () => {
+
+  const wrapper =
+    document.getElementById('servedWrapper');
+
+  wrapper.style.display =
+
+    wrapper.style.display === 'none'
+      ? 'block'
+      : 'none';
+
+};
+
+</script>
+
+</body>
+</html>
