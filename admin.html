@@ -1,136 +1,130 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-
-<title>Queue Admin</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Queue Admin - Mì Kung Fu</title>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-
 <style>
-
 body {
-
-  font-family: Arial;
+  font-family: Arial, sans-serif;
   max-width: 900px;
   margin: auto;
   padding: 20px;
   background: #f5f5f5;
-
 }
-
 .card {
-
   background: white;
   padding: 20px;
   border-radius: 12px;
   margin-bottom: 20px;
-
 }
-
 .store-buttons {
-
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
-
 }
-
 .store-btn {
-
   padding: 10px 20px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-
+  background: #ddd;
+  font-weight: bold;
 }
-
 .active {
-
   background: green;
   color: white;
-
 }
-
 .row {
-
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   padding: 10px 0;
   border-bottom: 1px solid #eee;
-
 }
-
 .serve-btn {
-
   background: green;
   color: white;
   border: none;
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
-
 }
-
 .restore-btn {
-
   background: #007bff;
   color: white;
   border: none;
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
-
 }
-
+.toggle-btn {
+  padding: 10px 14px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  background: #eef;
+  border: 1px solid #ccf;
+  border-radius: 8px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 15px;
+}
+.page-btn {
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.fb-item {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  background: #fafafa;
+  margin-bottom: 5px;
+  border-radius: 4px;
+}
+.fb-time {
+  font-size: 12px;
+  color: #777;
+}
 </style>
-
 </head>
-
 <body>
 
 <div class="card">
-
 <div class="store-buttons" id="storeButtons"></div>
-
-<h2>Khách đang chờ</h2>
-
+<h2 id="waitingTitle">Khách đang chờ: 0 (0)</h2>
 <div id="waitingList"></div>
-
 </div>
 
 <div class="card">
-
-<button id="toggleServed">
-
-Hiện danh sách đã phục vụ
-
-</button>
-
-<div id="servedWrapper"
-style="display:none">
-
-<h2>Đã phục vụ</h2>
-
-<div id="servedList"></div>
-
+<button id="toggleServed" class="toggle-btn">Hiện danh sách đã phục vụ</button>
+<div id="servedWrapper" style="display:none; margin-top: 15px;">
+  <h2>Đã phục vụ</h2>
+  <div id="servedList"></div>
 </div>
 
+<button id="toggleFeedback" class="toggle-btn" style="background: #fff3cd; border-color: #ffeeba;">Hiện danh sách ý kiến khách hàng</button>
+<div id="feedbackWrapper" style="display:none; margin-top: 15px;">
+  <h2>Ý kiến khách hàng</h2>
+  <div id="feedbackList"></div>
+  <div class="pagination">
+    <button id="prevPage" class="page-btn">◄ Trang trước</button>
+    <span id="pageInfo">Trang 1</span>
+    <button id="nextPage" class="page-btn">Trang sau ►</button>
+  </div>
+</div>
 </div>
 
 <script>
-
 const firebaseConfig = {
-
   apiKey: "AIzaSyD_hZDfeIR575b7n5Cshp1VRZg2y--raiw",
   authDomain: "mykungfu-31485.firebaseapp.com",
   databaseURL: "https://mykungfu-31485-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -138,252 +132,181 @@ const firebaseConfig = {
   storageBucket: "mykungfu-31485.firebasestorage.app",
   messagingSenderId: "830853417821",
   appId: "1:830853417821:web:f336fb6f4cc7660b7d36b4"
-
 };
 
 firebase.initializeApp(firebaseConfig);
-
 const db = firebase.database();
 
 const storeNames = {
-
-  kungfu: 'Mì Kung Fu',
-  musan: 'Lẩu Musan'
-
+  kungfu: 'Mì Kung Fu (Đường 2/9)',
+  kungfu2: 'Mì Kung Fu (Nguyễn Văn Thoại)'
 };
 
-const params =
-  new URLSearchParams(window.location.search);
+const params = new URLSearchParams(window.location.search);
+const currentStore = params.get('store') || 'kungfu';
+const today = new Date().toISOString().split('T')[0];
 
-const currentStore =
-  params.get('store') || 'kungfu';
+const waitingRef = db.ref(`queues/${today}/${currentStore}/waiting`);
+const servedRef = db.ref(`queues/${today}/${currentStore}/served`);
+const feedbackRef = db.ref(`feedbacks/${today}/${currentStore}`);
 
-const today =
-  new Date().toISOString().split('T')[0];
-
-const waitingRef =
-  db.ref(`queues/${today}/${currentStore}/waiting`);
-
-const servedRef =
-  db.ref(`queues/${today}/${currentStore}/served`);
-
-const storeButtons =
-  document.getElementById('storeButtons');
-
-Object.entries(storeNames)
-.forEach(([key, name]) => {
-
-  const btn =
-    document.createElement('button');
-
-  btn.className =
-    'store-btn';
-
-  if (key === currentStore) {
-
-    btn.classList.add('active');
-
-  }
-
+// Khởi tạo các nút cửa hàng
+const storeButtons = document.getElementById('storeButtons');
+Object.entries(storeNames).forEach(([key, name]) => {
+  const btn = document.createElement('button');
+  btn.className = 'store-btn';
+  if (key === currentStore) btn.classList.add('active');
   btn.innerText = name;
-
-  btn.onclick = () => {
-
-    window.location =
-      `admin.html?store=${key}`;
-
-  };
-
+  btn.onclick = () => { window.location = `admin.html?store=${key}`; };
   storeButtons.appendChild(btn);
-
 });
 
 function formatTime(ts) {
-
-  return new Date(ts)
-    .toLocaleTimeString('vi-VN');
-
+  return new Date(Number(ts)).toLocaleString('vi-VN');
 }
 
+// Chuyển danh xưng sang dạng viết tắt ngắn gọn
+function getShortGender(gender) {
+  if (gender === 'Anh') return 'A.';
+  if (gender === 'Chị') return 'C.';
+  return '';
+}
+
+// Render Realtime danh sách Đang chờ
 waitingRef.on('value', snapshot => {
-
   const data = snapshot.val() || {};
-
-  const list =
-    Object.entries(data);
-
-  const div =
-    document.getElementById('waitingList');
-
+  const list = Object.entries(data);
+  const div = document.getElementById('waitingList');
   div.innerHTML = '';
+  let totalGuests = 0;
 
   list.forEach(([id, item]) => {
-
-    const row =
-      document.createElement('div');
-
+    totalGuests += Number(item.guestCount || 0);
+    const row = document.createElement('div');
     row.className = 'row';
+    
+    const prefix = getShortGender(item.gender);
+    const displayName = prefix ? `${prefix} ${item.name}` : item.name;
 
     row.innerHTML = `
-
       <div>
-
-        <strong>${item.name}</strong>
-
-        |
-
-        ${item.guestCount} khách
-
-        |
-
-        ${item.phone}
-
+        <strong>${displayName}</strong> | ${item.guestCount} | ${item.phone}
       </div>
-
-      <button
-        class="serve-btn"
-        onclick="serveCustomer(
-          '${id}',
-          '${item.name}',
-          '${item.guestCount}',
-          '${item.phone}',
-          '${item.createdAt}'
-        )"
-      >
-
+      <button class="serve-btn" onclick="serveCustomer('${id}', '${item.gender || ''}', '${item.name}', '${item.guestCount}', '${item.phone}', '${item.createdAt}')">
         Serve
-
       </button>
-
     `;
-
     div.appendChild(row);
-
   });
-
+  document.getElementById('waitingTitle').innerText = `Khách đang chờ: ${list.length} (${totalGuests})`;
 });
 
+// Render Realtime danh sách Đã phục vụ
 servedRef.on('value', snapshot => {
-
   const data = snapshot.val() || {};
-
-  const list =
-    Object.entries(data);
-
-  const div =
-    document.getElementById('servedList');
-
+  const list = Object.entries(data).sort((a, b) => b[1].servedAt - a[1].servedAt);
+  const div = document.getElementById('servedList');
   div.innerHTML = '';
 
   list.forEach(([id, item]) => {
-
-    const row =
-      document.createElement('div');
-
+    const row = document.createElement('div');
     row.className = 'row';
+    const prefix = getShortGender(item.gender);
+    const displayName = prefix ? `${prefix} ${item.name}` : item.name;
 
     row.innerHTML = `
-
       <div>
-
-        <strong>${item.name}</strong>
-
-        |
-
-        ${item.guestCount} khách
-
-        |
-
-        ${item.phone}
-
-        <br>
-
-        Serve:
-        ${formatTime(item.servedAt)}
-
+        <strong>${displayName}</strong> | ${item.guestCount} | ${item.phone} <br>
+        <span style="font-size:12px; color:#666;">Served: ${formatTime(item.servedAt)}</span>
       </div>
-
-      <button
-        class="restore-btn"
-        onclick="restoreCustomer(
-          '${id}',
-          '${item.name}',
-          '${item.guestCount}',
-          '${item.phone}',
-          '${item.createdAt}'
-        )"
-      >
-
+      <button class="restore-btn" onclick="restoreCustomer('${id}', '${item.gender || ''}', '${item.name}', '${item.guestCount}', '${item.phone}', '${item.createdAt}')">
         ↻
-
       </button>
-
     `;
-
     div.appendChild(row);
-
   });
-
 });
 
-async function serveCustomer(
-  id,
-  name,
-  guestCount,
-  phone,
-  createdAt
-) {
+// Biến quản lý Phân trang cho phần Ý kiến khách hàng
+let allFeedbacks = [];
+let currentPage = 1;
+const itemsPerPage = 20;
 
-  await servedRef.push({
+// Lắng nghe dữ liệu ý kiến khách hàng realtime
+feedbackRef.on('value', snapshot => {
+  const data = snapshot.val() || {};
+  // Sắp xếp ý kiến từ mới nhất đến cũ nhất
+  allFeedbacks = Object.entries(data).sort((a, b) => b[1].createdAt - a[1].createdAt);
+  renderFeedbackPage();
+});
 
-    name,
-    guestCount,
-    phone,
-    createdAt,
-    servedAt: Date.now()
+function renderFeedbackPage() {
+  const div = document.getElementById('feedbackList');
+  div.innerHTML = '';
+  
+  const totalPages = Math.ceil(allFeedbacks.length / itemsPerPage) || 1;
+  if (currentPage > totalPages) currentPage = totalPages;
 
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const pageItems = allFeedbacks.slice(startIndex, endIndex);
+
+  if (pageItems.length === 0) {
+    div.innerHTML = '<p style="color:#666; font-style:italic;">Chưa có ý kiến nào trong ngày hôm nay.</p>';
+  }
+
+  pageItems.forEach(([id, item]) => {
+    const fbDiv = document.createElement('div');
+    fbDiv.className = 'fb-item';
+    
+    const prefix = getShortGender(item.gender);
+    let senderInfo = "Ẩn danh";
+    if (item.name || item.phone) {
+      senderInfo = `${prefix} ${item.name || 'Khách'}`.trim() + (item.phone ? ` (${item.phone})` : '');
+    }
+
+    fbDiv.innerHTML = `
+      <div style="font-weight: bold; color: #333;">${senderInfo}:</div>
+      <div style="margin: 5px 0; color: #111;">${item.content}</div>
+      <div class="fb-time">Gửi lúc: ${formatTime(item.createdAt)}</div>
+    `;
+    div.appendChild(fbDiv);
   });
 
+  document.getElementById('pageInfo').innerText = `Trang ${currentPage} / ${totalPages}`;
+  document.getElementById('prevPage').disabled = (currentPage === 1);
+  document.getElementById('nextPage').disabled = (currentPage === totalPages);
+}
+
+// Event cho các nút phân trang
+document.getElementById('prevPage').onclick = () => { if (currentPage > 1) { currentPage--; renderFeedbackPage(); } };
+document.getElementById('nextPage').onclick = () => { if (currentPage * itemsPerPage < allFeedbacks.length) { currentPage++; renderFeedbackPage(); } };
+
+// Các hàm tương tác Database
+async function serveCustomer(id, gender, name, guestCount, phone, createdAt) {
+  await servedRef.push({ gender, name, guestCount, phone, createdAt, servedAt: Date.now() });
   await waitingRef.child(id).remove();
-
 }
 
-async function restoreCustomer(
-  id,
-  name,
-  guestCount,
-  phone,
-  createdAt
-) {
-
-  await waitingRef.push({
-
-    name,
-    guestCount,
-    phone,
-    createdAt
-
-  });
-
+async function restoreCustomer(id, gender, name, guestCount, phone, createdAt) {
+  await waitingRef.push({ gender, name, guestCount, phone, createdAt });
   await servedRef.child(id).remove();
-
 }
 
-document.getElementById('toggleServed')
-.onclick = () => {
-
-  const wrapper =
-    document.getElementById('servedWrapper');
-
-  wrapper.style.display =
-
-    wrapper.style.display === 'none'
-      ? 'block'
-      : 'none';
-
+// Toggle Hiện/Ẩn các khối danh sách
+document.getElementById('toggleServed').onclick = () => {
+  const wrapper = document.getElementById('servedWrapper');
+  const isHidden = wrapper.style.display === 'none';
+  wrapper.style.display = isHidden ? 'block' : 'none';
+  document.getElementById('toggleServed').innerText = isHidden ? 'Ẩn danh sách đã phục vụ' : 'Hiện danh sách đã phục vụ';
 };
 
+document.getElementById('toggleFeedback').onclick = () => {
+  const wrapper = document.getElementById('feedbackWrapper');
+  const isHidden = wrapper.style.display === 'none';
+  wrapper.style.display = isHidden ? 'block' : 'none';
+  document.getElementById('toggleFeedback').innerText = isHidden ? 'Ẩn danh sách ý kiến khách hàng' : 'Hiện danh sách ý kiến khách hàng';
+};
 </script>
-
 </body>
 </html>
