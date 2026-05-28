@@ -22,26 +22,22 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
     .store-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      justify-content: center;
-    }
-    .store-logo {
-      height: 32px; /* Cao bằng font-size của h1 */
-      object-fit: contain;
-    }
-    h1 {
-      margin: 0;
-      font-size: 32px;
       text-align: center;
+      margin-bottom: 5px;
+    }
+    .store-title-img {
+      width: 100%;
+      max-width: 320px;
+      height: auto;
+      object-fit: contain;
     }
     .address {
       text-align: center;
       color: #666;
-      font-size: 14px;
+      font-size: 15.3px;
       margin-top: 5px;
       margin-bottom: 15px;
+      font-weight: bold;
     }
     .gender-selector {
       display: flex;
@@ -95,24 +91,60 @@
       background: gray;
       cursor: not-allowed;
     }
+    
     .success-box {
-      color: #155724;
-      background-color: #d4edda;
-      border: 1px solid #c3e6cb;
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 10px;
-      font-weight: bold;
-      line-height: 1.5;
-    }
-    .menu-link {
-      display: block;
+      background-color: #79e3cd;
+      color: #174239;
+      padding: 25px 15px;
+      border-radius: 20px;
       margin-top: 15px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .success-title {
+      font-size: 20px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      margin-bottom: 20px;
+    }
+    .success-details {
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1.6;
+    }
+
+    .menu-link-large {
+      display: block;
+      margin: 10px 0 20px 0;
       text-align: center;
       font-weight: bold;
       text-decoration: none;
-      color: #007bff;
+      background: #007bff;
+      color: white;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 18px;
+      box-shadow: 0 2px 5px rgba(0,123,255,0.3);
     }
+    
+    .wifi-info {
+      background: #f8f9fa;
+      border: 1px dashed #ccc;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      font-size: 15px;
+      color: #333;
+    }
+    .wifi-line {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .wifi-line:last-child {
+      margin-bottom: 0;
+    }
+
     .feedback-title {
       font-size: 18px;
       font-weight: bold;
@@ -120,29 +152,13 @@
       border-top: 1px solid #eee;
       padding-top: 15px;
     }
-    .hotline-wrapper {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 15px;
-    }
-    .hotline-btn {
-      display: inline-block;
-      background: #dc3545;
-      color: white;
-      padding: 8px 15px;
-      border-radius: 20px;
-      text-decoration: none;
-      font-weight: bold;
-      margin-left: 5px;
-    }
   </style>
 </head>
 <body>
 
   <div class="card">
     <div class="store-header">
-      <img src="mi kung fu logo.jpg" alt="Logo" class="store-logo" />
-      <h1 id="storeName">Mì Kung Fu</h1>
+      <img src="logo-mikungfu-title.png" alt="Mì Kung Fu" class="store-title-img" />
     </div>
     <div id="storeAddress" class="address"></div>
 
@@ -163,21 +179,29 @@
       <button id="submitBtn" class="main-btn" disabled>Đặt bàn</button>
     </div>
 
-    <div id="successMessage" style="display: none;" class="success-box"></div>
+    <div id="successMessage" style="display: none;" class="success-box">
+      <div class="success-title">BẠN ĐÃ ĐẶT BÀN THÀNH CÔNG</div>
+      <div id="successDetails" class="success-details"></div>
+    </div>
   </div>
 
   <div class="card">
-    <a class="menu-link" href="https://www.facebook.com/mikungfudn" target="_blank">🅵 Xem Fanpage</a>
-    <a class="menu-link" href="https://m.me/110354707866871?ref=.f.af475c640ccd4ab49bce4414c91603bf" target="_blank">📋 Xem Menu</a>
+    <a class="menu-link-large" href="https://m.me/110354707866871?ref=.f.af475c640ccd4ab49bce4414c91603bf" target="_blank">📋 XEM MENU</a>
+
+    <div class="wifi-info">
+      <div class="wifi-line">
+        <span>📶 <strong>WIFI:</strong></span>
+        <span>MI KUNG FU</span>
+      </div>
+      <div class="wifi-line">
+        <span>🔑 <strong>PASS:</strong></span>
+        <span>12346789</span>
+      </div>
+    </div>
 
     <div class="feedback-title">Ý Kiến Khách Hàng</div>
     <textarea id="feedbackContent" rows="3" placeholder="Nhập ý kiến đóng góp của bạn tại đây..."></textarea>
-    <button id="submitFeedbackBtn" class="main-btn" style="background: #6c757d; padding: 10px;">Gửi ý kiến</button>
-
-    <div class="hotline-wrapper">
-      Hoặc liên hệ trực tiếp Hotlines: 
-      <a href="tel:0906789999" class="hotline-btn">📞 0906789999</a>
-    </div>
+    <button id="submitFeedbackBtn" class="main-btn" style="background: #6c757d; padding: 10px; margin-top: 10px;">Gửi ý kiến</button>
   </div>
 
 <script>
@@ -199,18 +223,26 @@ const storesConfig = {
   kungfu2: { name: 'Mì Kung Fu', address: '225 Đường Nguyễn Văn Thoại' }
 };
 
-const params = new URLSearchParams(window.location.search);
-const storeKey = params.get('store') || 'kungfu';
-const currentStore = storesConfig[storeKey] || storesConfig['kungfu'];
+// XỬ LÝ URL THÔNG MINH: Kiểm tra param và tự động chuẩn hóa về kungfu nếu sai/thiếu
+let params = new URLSearchParams(window.location.search);
+let storeKey = params.get('store');
 
-document.getElementById('storeName').innerText = currentStore.name;
+if (!storeKey || !storesConfig[storeKey]) {
+  storeKey = 'kungfu';
+  // Đổi hẳn param trên thanh địa chỉ của trình duyệt mà không làm reload lại trang
+  const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?store=kungfu';
+  window.history.replaceState({ path: newUrl }, '', newUrl);
+}
+
+const currentStore = storesConfig[storeKey];
 document.getElementById('storeAddress').innerText = currentStore.address;
 
-const today = new Date().toISOString().split('T')[0];
-const waitingRef = db.ref(`queues/${today}/${storeKey}/waiting`);
-const feedbackRef = db.ref(`feedbacks/${today}/${storeKey}`);
+// Lấy ngày hiện tại đồng bộ chuẩn múi giờ Việt Nam GMT+7
+const d = new Date();
+const tzOffset = 7 * 60 * 60 * 1000;
+const localDate = new Date(d.getTime() + tzOffset);
+const today = localDate.toISOString().split('T')[0];
 
-// Quản lý biến cục bộ phục vụ việc Đặt bàn & Gửi ý kiến nhanh
 let selectedGender = '';
 let customerSubmittedName = '';
 let customerSubmittedPhone = '';
@@ -254,42 +286,37 @@ nameInput.addEventListener('input', checkForm);
 guestCountInput.addEventListener('input', checkForm);
 phoneInput.addEventListener('input', checkForm);
 
-function customFormatTime(ts) {
-  const d = new Date(ts);
-  const hours = String(d.getHours()).padStart(2, '0');
-  const minutes = String(d.getMinutes()).padStart(2, '0');
-  const day = d.getDate();
-  const month = d.getMonth() + 1;
-  const year = d.getFullYear();
-  return `${hours}h${minutes} ${day}/${month}/${year}`;
-}
-
 submitBtn.addEventListener('click', async () => {
   const name = nameInput.value.trim();
   const guestCount = guestCountInput.value.trim();
   const phone = phoneInput.value.trim();
   const timestamp = Date.now();
 
-  // Lưu thông tin để gửi feedback tự động điền nếu cần
   customerSubmittedName = name;
   customerSubmittedPhone = phone;
 
-  await waitingRef.push({
-    gender: selectedGender,
-    name,
-    guestCount,
-    phone,
-    createdAt: timestamp
-  });
+  const activeWaitingRef = db.ref(`queues/${today}/${storeKey}/waiting`);
 
-  // Ẩn form và hiện câu cảm ơn như cấu hình
-  document.getElementById('bookingFormWrapper').style.display = 'none';
-  const successBox = document.getElementById('successMessage');
-  successBox.innerText = `Cảm ơn ${selectedGender} ${name} đã đặt bàn thành công cho ${guestCount} khách vào lúc ${customFormatTime(timestamp)}`;
-  successBox.style.display = 'block';
+  try {
+    await activeWaitingRef.push({
+      gender: selectedGender,
+      name,
+      guestCount,
+      phone,
+      createdAt: timestamp
+    });
+
+    document.getElementById('bookingFormWrapper').style.display = 'none';
+    const detailsDiv = document.getElementById('successDetails');
+    detailsDiv.innerHTML = `${selectedGender} ${name} / ${guestCount} Khách<br>SĐT : ${phone}`;
+    document.getElementById('successMessage').style.display = 'block';
+
+  } catch (error) {
+    console.error("Lỗi gửi dữ liệu lên Firebase:", error);
+    alert("Đã xảy ra lỗi kết nối mạng. Vui lòng thử lại!");
+  }
 });
 
-// Xử lý gửi ý kiến khách hàng
 document.getElementById('submitFeedbackBtn').addEventListener('click', async () => {
   const content = document.getElementById('feedbackContent').value.trim();
   if (!content) {
@@ -297,21 +324,27 @@ document.getElementById('submitFeedbackBtn').addEventListener('click', async () 
     return;
   }
 
-  // Tự động nhận diện thông tin từ form Đặt bàn bên trên, nếu chưa điền thì lấy dữ liệu input hiện tại, ko có nữa thì để trống
   const finalName = customerSubmittedName || nameInput.value.trim() || "";
   const finalPhone = customerSubmittedPhone || phoneInput.value.trim() || "";
   const finalGender = selectedGender || "";
 
-  await feedbackRef.push({
-    gender: finalGender,
-    name: finalName,
-    phone: finalPhone,
-    content: content,
-    createdAt: Date.now()
-  });
+  const activeFeedbackRef = db.ref(`feedbacks/${today}/${storeKey}`);
 
-  alert('Gửi ý kiến đóng góp thành công. Cảm ơn bạn!');
-  document.getElementById('feedbackContent').value = '';
+  try {
+    await activeFeedbackRef.push({
+      gender: finalGender,
+      name: finalName,
+      phone: finalPhone,
+      content: content,
+      createdAt: Date.now()
+    });
+
+    alert('Gửi ý kiến đóng góp thành công. Cảm ơn bạn!');
+    document.getElementById('feedbackContent').value = '';
+  } catch (error) {
+    console.error("Lỗi gửi ý kiến lên Firebase:", error);
+    alert("Không thể gửi ý kiến lúc này. Vui lòng thử lại!");
+  }
 });
 </script>
 </body>
