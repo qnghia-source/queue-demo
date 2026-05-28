@@ -1,62 +1,85 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
-
   <meta charset="UTF-8" />
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
-
-  <title>Đặt Bàn</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đặt Bàn - Mì Kung Fu</title>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-
   <style>
-
     body {
-
-      font-family: Arial;
+      font-family: Arial, sans-serif;
       max-width: 500px;
       margin: auto;
       padding: 20px;
       background: #f5f5f5;
-
     }
-
     .card {
-
       background: white;
       padding: 20px;
       border-radius: 12px;
       margin-bottom: 20px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-
     }
-
+    .store-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+    }
+    .store-logo {
+      height: 32px; /* Cao bằng font-size của h1 */
+      object-fit: contain;
+    }
     h1 {
-
+      margin: 0;
+      font-size: 32px;
       text-align: center;
-
     }
-
-    input {
-
+    .address {
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+    }
+    .gender-selector {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .gender-btn {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background: #fff;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      color: #333;
+    }
+    .gender-btn.selected {
+      background: #28a745;
+      color: white;
+      border-color: #28a745;
+    }
+    input, textarea {
       width: 100%;
       padding: 12px;
-      margin-top: 10px;
+      margin-top: 12px;
       border-radius: 8px;
       border: 1px solid #ccc;
       box-sizing: border-box;
-
+      font-family: Arial, sans-serif;
     }
-
-    button {
-
+    textarea {
+      resize: none;
+    }
+    button.main-btn {
       width: 100%;
       padding: 14px;
       margin-top: 15px;
@@ -66,139 +89,99 @@
       color: white;
       font-size: 16px;
       cursor: pointer;
-
+      font-weight: bold;
     }
-
-    button:disabled {
-
+    button.main-btn:disabled {
       background: gray;
       cursor: not-allowed;
-
     }
-
-    ul {
-
-      padding-left: 0;
-      list-style: none;
-
-    }
-
-    .success {
-
-      color: green;
+    .success-box {
+      color: #155724;
+      background-color: #d4edda;
+      border: 1px solid #c3e6cb;
+      padding: 15px;
+      border-radius: 8px;
       margin-top: 10px;
       font-weight: bold;
-
+      line-height: 1.5;
     }
-
-    .menu-img {
-
-      width: 100%;
-      border-radius: 12px;
-      margin-top: 15px;
-
-    }
-
     .menu-link {
-
       display: block;
-      margin-top: 20px;
+      margin-top: 15px;
       text-align: center;
       font-weight: bold;
       text-decoration: none;
-
+      color: #007bff;
     }
-
-    .queue-item {
-
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-
+    .feedback-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 25px;
+      border-top: 1px solid #eee;
+      padding-top: 15px;
     }
-
-    .queue-icon {
-
-      width: 18px;
-      height: 18px;
-
+    .hotline-wrapper {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 15px;
     }
-
+    .hotline-btn {
+      display: inline-block;
+      background: #dc3545;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: bold;
+      margin-left: 5px;
+    }
   </style>
-
 </head>
-
 <body>
 
   <div class="card">
+    <div class="store-header">
+      <img src="mi kung fu logo.jpg" alt="Logo" class="store-logo" />
+      <h1 id="storeName">Mì Kung Fu</h1>
+    </div>
+    <div id="storeAddress" class="address"></div>
 
-    <h1 id="storeName"></h1>
+    <div id="bookingFormWrapper">
+      <div class="gender-selector">
+        <button type="button" class="gender-btn" id="btnAnh" onclick="selectGender('Anh')">
+          <span id="iconAnh">○</span> Anh
+        </button>
+        <button type="button" class="gender-btn" id="btnChi" onclick="selectGender('Chị')">
+          <span id="iconChi">○</span> Chị
+        </button>
+      </div>
 
-    <p>
+      <input type="text" id="name" placeholder="Tên của bạn" />
+      <input type="number" id="guestCount" placeholder="Số lượng khách" />
+      <input type="tel" id="phone" placeholder="Số điện thoại" />
+      
+      <button id="submitBtn" class="main-btn" disabled>Đặt bàn</button>
+    </div>
 
-      <strong>Số lượt khách đang chờ:</strong>
-
-      <span id="count">0</span>
-
-    </p>
-
-    <ul id="queueList"></ul>
-
+    <div id="successMessage" style="display: none;" class="success-box"></div>
   </div>
 
   <div class="card">
+    <a class="menu-link" href="https://www.facebook.com/mikungfudn" target="_blank">🅵 Xem Fanpage</a>
+    <a class="menu-link" href="https://m.me/110354707866871?ref=.f.af475c640ccd4ab49bce4414c91603bf" target="_blank">📋 Xem Menu</a>
 
-    <input
-      type="text"
-      id="name"
-      placeholder="Tên của bạn"
-    />
+    <div class="feedback-title">Ý Kiến Khách Hàng</div>
+    <textarea id="feedbackContent" rows="3" placeholder="Nhập ý kiến đóng góp của bạn tại đây..."></textarea>
+    <button id="submitFeedbackBtn" class="main-btn" style="background: #6c757d; padding: 10px;">Gửi ý kiến</button>
 
-    <input
-      type="number"
-      id="guestCount"
-      placeholder="Số lượng khách"
-    />
-
-    <input
-      type="tel"
-      id="phone"
-      placeholder="Số điện thoại"
-    />
-
-    <button
-      id="submitBtn"
-      disabled
-    >
-
-      Đăng Ký Đặt Bàn
-
-    </button>
-
-    <div
-      id="success"
-      class="success"
-    ></div>
-
-    <a
-  class="menu-link"
-
-  href="https://www.facebook.com/mikungfudn"
-
-  target="_blank"
-
->
-
-  Xem Fanpage
-    </a>
-
+    <div class="hotline-wrapper">
+      Hoặc liên hệ trực tiếp Hotlines: 
+      <a href="tel:0906789999" class="hotline-btn">📞 0906789999</a>
+    </div>
   </div>
 
 <script>
-
 const firebaseConfig = {
-
   apiKey: "AIzaSyD_hZDfeIR575b7n5Cshp1VRZg2y--raiw",
   authDomain: "mykungfu-31485.firebaseapp.com",
   databaseURL: "https://mykungfu-31485-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -206,158 +189,130 @@ const firebaseConfig = {
   storageBucket: "mykungfu-31485.firebasestorage.app",
   messagingSenderId: "830853417821",
   appId: "1:830853417821:web:f336fb6f4cc7660b7d36b4"
-
 };
 
 firebase.initializeApp(firebaseConfig);
-
 const db = firebase.database();
 
-const storeNames = {
-
-  kungfu: 'Mì Kung Fu',
-
-  musan: 'Lẩu Musan'
-
+const storesConfig = {
+  kungfu: { name: 'Mì Kung Fu', address: '124B Đường 2/9' },
+  kungfu2: { name: 'Mì Kung Fu', address: '225 Đường Nguyễn Văn Thoại' }
 };
 
-const params =
-  new URLSearchParams(window.location.search);
+const params = new URLSearchParams(window.location.search);
+const storeKey = params.get('store') || 'kungfu';
+const currentStore = storesConfig[storeKey] || storesConfig['kungfu'];
 
-const store =
-  params.get('store') || 'kungfu';
+document.getElementById('storeName').innerText = currentStore.name;
+document.getElementById('storeAddress').innerText = currentStore.address;
 
-document.getElementById('storeName').innerText =
-  storeNames[store];
+const today = new Date().toISOString().split('T')[0];
+const waitingRef = db.ref(`queues/${today}/${storeKey}/waiting`);
+const feedbackRef = db.ref(`feedbacks/${today}/${storeKey}`);
 
-const today =
-  new Date().toISOString().split('T')[0];
+// Quản lý biến cục bộ phục vụ việc Đặt bàn & Gửi ý kiến nhanh
+let selectedGender = '';
+let customerSubmittedName = '';
+let customerSubmittedPhone = '';
 
-const waitingRef =
-  db.ref(`queues/${today}/${store}/waiting`);
+function selectGender(gender) {
+  selectedGender = gender;
+  const btnAnh = document.getElementById('btnAnh');
+  const btnChi = document.getElementById('btnChi');
+  const iconAnh = document.getElementById('iconAnh');
+  const iconChi = document.getElementById('iconChi');
 
-function maskPhone(phone) {
-
-  return '*******' + phone.slice(-3);
-
+  if (gender === 'Anh') {
+    btnAnh.classList.add('selected');
+    btnChi.classList.remove('selected');
+    iconAnh.innerText = '●';
+    iconChi.innerText = '○';
+  } else {
+    btnChi.classList.add('selected');
+    btnAnh.classList.remove('selected');
+    iconChi.innerText = '●';
+    iconAnh.innerText = '○';
+  }
+  checkForm();
 }
 
-waitingRef.on('value', snapshot => {
-
-  const data = snapshot.val() || {};
-
-  const list =
-    Object.entries(data);
-
-  const ul =
-    document.getElementById('queueList');
-
-  ul.innerHTML = '';
-
-  list.forEach(([id, item]) => {
-
-    const li =
-      document.createElement('li');
-
-    li.className = 'queue-item';
-
-    li.innerHTML = `
-
-      <img
-        src="guest icon.png"
-        class="queue-icon"
-      />
-
-      <span>
-
-        ${item.name}
-        -
-        ${maskPhone(item.phone)}
-
-      </span>
-
-    `;
-
-    ul.appendChild(li);
-
-  });
-
-  document.getElementById('count').innerText =
-    list.length;
-
-});
-
-const nameInput =
-  document.getElementById('name');
-
-const guestCountInput =
-  document.getElementById('guestCount');
-
-const phoneInput =
-  document.getElementById('phone');
-
-const submitBtn =
-  document.getElementById('submitBtn');
+const nameInput = document.getElementById('name');
+const guestCountInput = document.getElementById('guestCount');
+const phoneInput = document.getElementById('phone');
+const submitBtn = document.getElementById('submitBtn');
 
 function checkForm() {
-
   submitBtn.disabled = !(
-
+    selectedGender &&
     nameInput.value.trim() &&
     guestCountInput.value.trim() &&
     phoneInput.value.trim()
-
   );
-
 }
 
 nameInput.addEventListener('input', checkForm);
-
 guestCountInput.addEventListener('input', checkForm);
-
 phoneInput.addEventListener('input', checkForm);
 
+function customFormatTime(ts) {
+  const d = new Date(ts);
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  const day = d.getDate();
+  const month = d.getMonth() + 1;
+  const year = d.getFullYear();
+  return `${hours}h${minutes} ${day}/${month}/${year}`;
+}
+
 submitBtn.addEventListener('click', async () => {
+  const name = nameInput.value.trim();
+  const guestCount = guestCountInput.value.trim();
+  const phone = phoneInput.value.trim();
+  const timestamp = Date.now();
 
-  const name =
-    nameInput.value.trim();
-
-  const guestCount =
-    guestCountInput.value.trim();
-
-  const phone =
-    phoneInput.value.trim();
+  // Lưu thông tin để gửi feedback tự động điền nếu cần
+  customerSubmittedName = name;
+  customerSubmittedPhone = phone;
 
   await waitingRef.push({
-
+    gender: selectedGender,
     name,
     guestCount,
     phone,
-
-    createdAt: Date.now()
-
+    createdAt: timestamp
   });
 
-  document.getElementById('success').innerText =
-
-    'Đăng ký đặt bàn thành công';
-
-  document.getElementById('menu').style.display =
-
-    'block';
-
-  nameInput.value = '';
-
-  guestCountInput.value = '';
-
-  phoneInput.value = '';
-
-  submitBtn.disabled = true;
-
+  // Ẩn form và hiện câu cảm ơn như cấu hình
+  document.getElementById('bookingFormWrapper').style.display = 'none';
+  const successBox = document.getElementById('successMessage');
+  successBox.innerText = `Cảm ơn ${selectedGender} ${name} đã đặt bàn thành công cho ${guestCount} khách vào lúc ${customFormatTime(timestamp)}`;
+  successBox.style.display = 'block';
 });
 
+// Xử lý gửi ý kiến khách hàng
+document.getElementById('submitFeedbackBtn').addEventListener('click', async () => {
+  const content = document.getElementById('feedbackContent').value.trim();
+  if (!content) {
+    alert('Vui lòng nhập nội dung ý kiến trước khi gửi!');
+    return;
+  }
 
+  // Tự động nhận diện thông tin từ form Đặt bàn bên trên, nếu chưa điền thì lấy dữ liệu input hiện tại, ko có nữa thì để trống
+  const finalName = customerSubmittedName || nameInput.value.trim() || "";
+  const finalPhone = customerSubmittedPhone || phoneInput.value.trim() || "";
+  const finalGender = selectedGender || "";
+
+  await feedbackRef.push({
+    gender: finalGender,
+    name: finalName,
+    phone: finalPhone,
+    content: content,
+    createdAt: Date.now()
+  });
+
+  alert('Gửi ý kiến đóng góp thành công. Cảm ơn bạn!');
+  document.getElementById('feedbackContent').value = '';
+});
 </script>
-
 </body>
 </html>
