@@ -13,6 +13,29 @@
       margin: auto;
       padding: 20px;
       background: #f5f5f5;
+      position: relative;
+    }
+    /* Vùng chứa 2 nút chuyển ngôn ngữ ở góc phải màn hình */
+    .lang-switcher {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+    .lang-btn {
+      font-size: 24px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      opacity: 0.5;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .lang-btn.active {
+      opacity: 1;
+      transform: scale(1.15);
     }
     .card {
       background: white;
@@ -20,10 +43,12 @@
       border-radius: 12px;
       margin-bottom: 20px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      position: relative;
     }
     .store-header {
       text-align: center;
       margin-bottom: 5px;
+      padding-top: 15px; /* Tạo khoảng trống tránh đè vào nút ngôn ngữ */
     }
     .store-title-img {
       width: 100%;
@@ -156,6 +181,11 @@
 </head>
 <body>
 
+  <div class="lang-switcher">
+    <button class="lang-btn" id="lang-vi" onclick="switchLanguage('vi')" title="Tiếng Việt">🇻🇳</button>
+    <button class="lang-btn" id="lang-en" onclick="switchLanguage('en')" title="English">🇬🇧</button>
+  </div>
+
   <div class="card">
     <div class="store-header">
       <img src="logo-mikungfu-title.png" alt="Mì Kung Fu" class="store-title-img" />
@@ -165,10 +195,10 @@
     <div id="bookingFormWrapper">
       <div class="gender-selector">
         <button type="button" class="gender-btn" id="btnAnh" onclick="selectGender('Anh')">
-          <span id="iconAnh">○</span> Anh
+          <span id="iconAnh">○</span> <span id="textAnh">Anh</span>
         </button>
         <button type="button" class="gender-btn" id="btnChi" onclick="selectGender('Chị')">
-          <span id="iconChi">○</span> Chị
+          <span id="iconChi">○</span> <span id="textChi">Chị</span>
         </button>
       </div>
 
@@ -180,13 +210,13 @@
     </div>
 
     <div id="successMessage" style="display: none;" class="success-box">
-      <div class="success-title">BẠN ĐÃ ĐẶT BÀN THÀNH CÔNG</div>
+      <div class="success-title" id="textSuccessTitle">BẠN ĐÃ ĐẶT BÀN THÀNH CÔNG</div>
       <div id="successDetails" class="success-details"></div>
     </div>
   </div>
 
   <div class="card">
-    <a class="menu-link-large" href="https://m.me/110354707866871?ref=.f.af475c640ccd4ab49bce4414c91603bf" target="_blank">📋 XEM MENU</a>
+    <a class="menu-link-large" id="btnMenuLarge" href="https://m.me/110354707866871?ref=.f.af475c640ccd4ab49bce4414c91603bf" target="_blank">📋 XEM MENU</a>
 
     <div class="wifi-info">
       <div class="wifi-line">
@@ -199,7 +229,7 @@
       </div>
     </div>
 
-    <div class="feedback-title">Ý Kiến Khách Hàng</div>
+    <div class="feedback-title" id="textFeedbackTitle">Ý Kiến Khách Hàng</div>
     <textarea id="feedbackContent" rows="3" placeholder="Nhập ý kiến đóng góp của bạn tại đây..."></textarea>
     <button id="submitFeedbackBtn" class="main-btn" style="background: #6c757d; padding: 10px; margin-top: 10px;">Gửi ý kiến</button>
   </div>
@@ -223,13 +253,56 @@ const storesConfig = {
   kungfu2: { name: 'Mì Kung Fu', address: '225 Đường Nguyễn Văn Thoại' }
 };
 
-// XỬ LÝ URL THÔNG MINH: Kiểm tra param và tự động chuẩn hóa về kungfu nếu sai/thiếu
+// Từ điển đa ngôn ngữ lưu trữ toàn bộ nội dung dịch
+const dictionary = {
+  vi: {
+    placeholderName: "Tên của bạn",
+    placeholderGuest: "Số lượng khách",
+    placeholderPhone: "Số điện thoại",
+    btnSubmit: "Đặt bàn",
+    successTitle: "BẠN ĐÃ ĐẶT BÀN THÀNH CÔNG",
+    btnMenu: "📋 XEM MENU",
+    feedbackTitle: "Ý Kiến Khách Hàng",
+    placeholderFeedback: "Nhập ý kiến đóng góp của bạn tại đây...",
+    btnFeedback: "Gửi ý kiến",
+    titleAnh: "Anh",
+    titleChi: "Chị",
+    alertFeedbackEmpty: "Vui lòng nhập nội dung ý kiến trước khi gửi!",
+    alertFeedbackSuccess: "Gửi ý kiến đóng góp thành công. Cảm ơn bạn!",
+    alertFeedbackError: "Không thể gửi ý kiến lúc này. Vui lòng thử lại!",
+    alertBookingError: "Đã xảy ra lỗi kết nối mạng. Vui lòng thử lại!",
+    labelGuests: "Khách",
+    labelPhone: "SĐT"
+  },
+  en: {
+    placeholderName: "Your Name",
+    placeholderGuest: "Number of Guests",
+    placeholderPhone: "Phone Number",
+    btnSubmit: "Book a Table",
+    successTitle: "BOOKING SUCCESSFUL!",
+    btnMenu: "📋 VIEW MENU",
+    feedbackTitle: "Customer Feedback",
+    placeholderFeedback: "Enter your feedback or suggestions here...",
+    btnFeedback: "Submit Feedback",
+    titleAnh: "Mr.",
+    titleChi: "Ms.",
+    alertFeedbackEmpty: "Please enter your feedback before submitting!",
+    alertFeedbackSuccess: "Feedback submitted successfully. Thank you!",
+    alertFeedbackError: "Could not submit feedback at this time. Please try again!",
+    alertBookingError: "Network connection error. Please try again!",
+    labelGuests: "Guests",
+    labelPhone: "Phone"
+  }
+};
+
+// Thiết lập ngôn ngữ mặc định (ưu tiên cấu hình cũ từ localStorage nếu có)
+let currentLang = localStorage.getItem('kungfu_lang') || 'vi';
+
 let params = new URLSearchParams(window.location.search);
 let storeKey = params.get('store');
 
 if (!storeKey || !storesConfig[storeKey]) {
   storeKey = 'kungfu';
-  // Đổi hẳn param trên thanh địa chỉ của trình duyệt mà không làm reload lại trang
   const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?store=kungfu';
   window.history.replaceState({ path: newUrl }, '', newUrl);
 }
@@ -237,7 +310,6 @@ if (!storeKey || !storesConfig[storeKey]) {
 const currentStore = storesConfig[storeKey];
 document.getElementById('storeAddress').innerText = currentStore.address;
 
-// Lấy ngày hiện tại đồng bộ chuẩn múi giờ Việt Nam GMT+7
 const d = new Date();
 const tzOffset = 7 * 60 * 60 * 1000;
 const localDate = new Date(d.getTime() + tzOffset);
@@ -246,6 +318,35 @@ const today = localDate.toISOString().split('T')[0];
 let selectedGender = '';
 let customerSubmittedName = '';
 let customerSubmittedPhone = '';
+
+// Hàm kích hoạt chuyển đổi ngôn ngữ
+function switchLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('kungfu_lang', lang);
+  
+  // Thay đổi trạng thái sáng/mờ của icon cờ
+  document.getElementById('lang-vi').classList.toggle('active', lang === 'vi');
+  document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+  
+  // Áp dụng ngôn ngữ vào các thẻ HTML tương ứng
+  const langData = dictionary[lang];
+  document.getElementById('name').placeholder = langData.placeholderName;
+  document.getElementById('guestCount').placeholder = langData.placeholderGuest;
+  document.getElementById('phone').placeholder = langData.placeholderPhone;
+  document.getElementById('submitBtn').innerText = langData.btnSubmit;
+  document.getElementById('textSuccessTitle').innerText = langData.successTitle;
+  document.getElementById('btnMenuLarge').innerText = langData.btnMenu;
+  document.getElementById('textFeedbackTitle').innerText = langData.feedbackTitle;
+  document.getElementById('feedbackContent').placeholder = langData.placeholderFeedback;
+  document.getElementById('submitFeedbackBtn').innerText = langData.btnFeedback;
+  document.getElementById('textAnh').innerText = langData.titleAnh;
+  document.getElementById('textChi').innerText = langData.titleChi;
+  
+  // Nếu đã đặt bàn thành công trước đó, cập nhật lại nhãn hiển thị trong hộp thông báo thành công
+  if (customerSubmittedName) {
+    updateSuccessBoxDisplay();
+  }
+}
 
 function selectGender(gender) {
   selectedGender = gender;
@@ -286,6 +387,16 @@ nameInput.addEventListener('input', checkForm);
 guestCountInput.addEventListener('input', checkForm);
 phoneInput.addEventListener('input', checkForm);
 
+// Hàm cập nhật chữ trong hộp thông báo đặt bàn thành công theo ngôn ngữ hiện hành
+function updateSuccessBoxDisplay() {
+  const langData = dictionary[currentLang];
+  const translatedGender = selectedGender === 'Anh' ? langData.titleAnh : langData.titleChi;
+  const guestCount = document.getElementById('guestCount').value.trim();
+  
+  const detailsDiv = document.getElementById('successDetails');
+  detailsDiv.innerHTML = `${translatedGender} ${customerSubmittedName} / ${guestCount} ${langData.labelGuests}<br>${langData.labelPhone} : ${customerSubmittedPhone}`;
+}
+
 submitBtn.addEventListener('click', async () => {
   const name = nameInput.value.trim();
   const guestCount = guestCountInput.value.trim();
@@ -307,20 +418,19 @@ submitBtn.addEventListener('click', async () => {
     });
 
     document.getElementById('bookingFormWrapper').style.display = 'none';
-    const detailsDiv = document.getElementById('successDetails');
-    detailsDiv.innerHTML = `${selectedGender} ${name} / ${guestCount} Khách<br>SĐT : ${phone}`;
+    updateSuccessBoxDisplay();
     document.getElementById('successMessage').style.display = 'block';
 
   } catch (error) {
-    console.error("Lỗi gửi dữ liệu lên Firebase:", error);
-    alert("Đã xảy ra lỗi kết nối mạng. Vui lòng thử lại!");
+    console.error("Lỗi:", error);
+    alert(dictionary[currentLang].alertBookingError);
   }
 });
 
 document.getElementById('submitFeedbackBtn').addEventListener('click', async () => {
   const content = document.getElementById('feedbackContent').value.trim();
   if (!content) {
-    alert('Vui lòng nhập nội dung ý kiến trước khi gửi!');
+    alert(dictionary[currentLang].alertFeedbackEmpty);
     return;
   }
 
@@ -339,13 +449,16 @@ document.getElementById('submitFeedbackBtn').addEventListener('click', async () 
       createdAt: Date.now()
     });
 
-    alert('Gửi ý kiến đóng góp thành công. Cảm ơn bạn!');
+    alert(dictionary[currentLang].alertFeedbackSuccess);
     document.getElementById('feedbackContent').value = '';
   } catch (error) {
-    console.error("Lỗi gửi ý kiến lên Firebase:", error);
-    alert("Không thể gửi ý kiến lúc này. Vui lòng thử lại!");
+    console.error("Lỗi:", error);
+    alert(dictionary[currentLang].alertFeedbackError);
   }
 });
+
+// Chạy khởi tạo ngôn ngữ ngay khi trang web vừa tải xong
+switchLanguage(currentLang);
 </script>
 </body>
 </html>
