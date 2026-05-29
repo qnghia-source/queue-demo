@@ -15,7 +15,6 @@
       background: #f5f5f5;
       position: relative;
     }
-    /* Vùng chứa 2 nút chuyển ngôn ngữ ở góc phải màn hình */
     .lang-switcher {
       position: absolute;
       top: 20px;
@@ -48,7 +47,7 @@
     .store-header {
       text-align: center;
       margin-bottom: 5px;
-      padding-top: 15px; /* Tạo khoảng trống tránh đè vào nút ngôn ngữ */
+      padding-top: 15px;
     }
     .store-title-img {
       width: 100%;
@@ -127,15 +126,24 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     .success-title {
-      font-size: 20px;
+      font-size: 17.5px; /* Giảm nhẹ từ 20px xuống để vừa vặn hoàn hảo trên một dòng di động */
       font-weight: bold;
       letter-spacing: 0.5px;
       margin-bottom: 20px;
+      white-space: nowrap; /* Đảm bảo ép text nằm trên một dòng */
     }
     .success-details {
       font-size: 18px;
       font-weight: bold;
       line-height: 1.6;
+    }
+    /* Style cho 2 dòng thông báo bổ sung mới */
+    .success-notice {
+      font-size: 14.5px;
+      font-weight: bold;
+      margin-top: 15px;
+      line-height: 1.5;
+      color: #174239;
     }
 
     .menu-link-large {
@@ -212,6 +220,7 @@
     <div id="successMessage" style="display: none;" class="success-box">
       <div class="success-title" id="textSuccessTitle">BẠN ĐÃ ĐẶT BÀN THÀNH CÔNG</div>
       <div id="successDetails" class="success-details"></div>
+      <div id="successNotice" class="success-notice"></div>
     </div>
   </div>
 
@@ -253,7 +262,6 @@ const storesConfig = {
   kungfu2: { name: 'Mì Kung Fu', address: '225 Đường Nguyễn Văn Thoại' }
 };
 
-// Từ điển đa ngôn ngữ lưu trữ toàn bộ nội dung dịch
 const dictionary = {
   vi: {
     placeholderName: "Tên của bạn",
@@ -272,7 +280,9 @@ const dictionary = {
     alertFeedbackError: "Không thể gửi ý kiến lúc này. Vui lòng thử lại!",
     alertBookingError: "Đã xảy ra lỗi kết nối mạng. Vui lòng thử lại!",
     labelGuests: "Khách",
-    labelPhone: "SĐT"
+    labelPhone: "SĐT",
+    // Đoạn dịch bổ sung cho thông báo
+    noticeLines: "KHI ĐẾN LƯỢT NHÂN VIÊN SẼ<br>MỜI QUÝ KHÁCH VÀO BÀN"
   },
   en: {
     placeholderName: "Your Name",
@@ -291,11 +301,12 @@ const dictionary = {
     alertFeedbackError: "Could not submit feedback at this time. Please try again!",
     alertBookingError: "Network connection error. Please try again!",
     labelGuests: "Guests",
-    labelPhone: "Phone"
+    labelPhone: "Phone",
+    // Đoạn dịch bổ sung cho thông báo bằng tiếng Anh gọn gàng
+    noticeLines: "OUR STAFF WILL INVITE YOU IN<br>WHEN IT IS YOUR TURN"
   }
 };
 
-// Thiết lập ngôn ngữ mặc định (ưu tiên cấu hình cũ từ localStorage nếu có)
 let currentLang = localStorage.getItem('kungfu_lang') || 'vi';
 
 let params = new URLSearchParams(window.location.search);
@@ -319,16 +330,13 @@ let selectedGender = '';
 let customerSubmittedName = '';
 let customerSubmittedPhone = '';
 
-// Hàm kích hoạt chuyển đổi ngôn ngữ
 function switchLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('kungfu_lang', lang);
   
-  // Thay đổi trạng thái sáng/mờ của icon cờ
   document.getElementById('lang-vi').classList.toggle('active', lang === 'vi');
   document.getElementById('lang-en').classList.toggle('active', lang === 'en');
   
-  // Áp dụng ngôn ngữ vào các thẻ HTML tương ứng
   const langData = dictionary[lang];
   document.getElementById('name').placeholder = langData.placeholderName;
   document.getElementById('guestCount').placeholder = langData.placeholderGuest;
@@ -342,7 +350,9 @@ function switchLanguage(lang) {
   document.getElementById('textAnh').innerText = langData.titleAnh;
   document.getElementById('textChi').innerText = langData.titleChi;
   
-  // Nếu đã đặt bàn thành công trước đó, cập nhật lại nhãn hiển thị trong hộp thông báo thành công
+  // Luôn cập nhật hoặc chuẩn bị sẵn nội dung thông báo lưu ý theo ngôn ngữ đã chọn
+  document.getElementById('successNotice').innerHTML = langData.noticeLines;
+  
   if (customerSubmittedName) {
     updateSuccessBoxDisplay();
   }
@@ -387,7 +397,6 @@ nameInput.addEventListener('input', checkForm);
 guestCountInput.addEventListener('input', checkForm);
 phoneInput.addEventListener('input', checkForm);
 
-// Hàm cập nhật chữ trong hộp thông báo đặt bàn thành công theo ngôn ngữ hiện hành
 function updateSuccessBoxDisplay() {
   const langData = dictionary[currentLang];
   const translatedGender = selectedGender === 'Anh' ? langData.titleAnh : langData.titleChi;
@@ -457,7 +466,6 @@ document.getElementById('submitFeedbackBtn').addEventListener('click', async () 
   }
 });
 
-// Chạy khởi tạo ngôn ngữ ngay khi trang web vừa tải xong
 switchLanguage(currentLang);
 </script>
 </body>
