@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Admin</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; padding: 20px; }
+        .card { max-width: 320px; margin: 80px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h3 { margin-top: 0; color: #333; text-align: center; }
+        input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 15px; font-weight: bold; }
+        button:hover { background-color: #0056b3; }
+        .link-toggle { text-align: center; margin-top: 15px; font-size: 14px; color: #007bff; cursor: pointer; text-decoration: underline; }
+        .msg { font-weight: bold; font-size: 14px; text-align: center; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="loginSection" class="card">
+        <h3>Nhập password admin</h3>
+        <input type="password" id="adminPass" placeholder="Mật khẩu của bạn...">
+        <button onclick="loginAdmin()">Vào trang Admin</button>
+        <div class="msg" id="loginMsg" style="color: red;"></div>
+        
+        <div class="link-toggle" onclick="toggleSection('changePassSection', 'loginSection')">Bấm vào đây để Đổi mật khẩu</div>
+    </div>
+
+    <div id="changePassSection" class="card" style="display: none;">
+        <h3>Đổi Mật Khẩu Admin</h3>
+        <input type="password" id="oldPass" placeholder="Nhập mật khẩu CŨ">
+        <input type="password" id="newPass" placeholder="Nhập mật khẩu MỚI (Từ 6 ký tự)">
+        <button onclick="changePassword()" style="background-color: #28a745;">Xác nhận cập nhật</button>
+        <div class="msg" id="changeMsg"></div>
+        
+        <div class="link-toggle" onclick="toggleSection('loginSection', 'changePassSection')" style="color: #6c757d;">Quay lại đăng nhập</div>
+    </div>
+
+    <script>
+        // TODO: THAY THẾ BẰNG CẤU HÌNH FIREBASE THỰC TẾ CỦA BẠN
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        // Khởi tạo Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        const emailAdmin = "admin@kungfu.com"; // Email cố định của bạn
+
+        // Hàm ẩn hiện qua lại giữa 2 khung
+        function toggleSection(showId, hideId) {
+            document.getElementById(showId).style.display = 'block';
+            document.getElementById(hideId).style.display = 'none';
+            // Xóa thông báo cũ khi chuyển form
+            document.getElementById('loginMsg').innerText = '';
+            document.getElementById('changeMsg').innerText = '';
+        }
+
+        // 1. XỬ LÝ ĐĂNG NHẬP
+        function loginAdmin() {
+            const password = document.getElementById('adminPass').value;
+            const loginMsg = document.getElementById('loginMsg');
+
+            if(!password) {
+                loginMsg.innerText = "Vui lòng nhập mật khẩu!";
+                return;
+            }
+
+            firebase.auth().signInWithEmailAndPassword(emailAdmin, password)
+            .then((userCredential) => {
+                // Đăng nhập đúng -> Thiết lập phiên đăng nhập sống trong 7 ngày (Tính bằng mili-giây)
+                const expireTime = Date.now() + (7 * 24 * 60 * 60 * 1000); 
+                localStorage.setItem('admin_session', expireTime);
+                
+                // Chuyển hướng thành công vào trang dashboard chính của bạn
+                window.location.href = 'admin.html'; 
+            })
+            .catch((error) => {
+                loginMsg.innerText = "Sai mật khẩu rồi bạn ơi!";
+                console.error(error);
+            });
+        }
+
+        // 2. XỬ LÝ ĐỔI MẬT KHẨU
+        function changePassword() {
+            const oldPass = document.getElementById('oldPass').value;
+            const newPass = document.getElementById('newPass').value;
+            const changeMsg = document.getElementById('changeMsg');
+
+            if(!oldPass || !newPass) {
+                changeMsg.style.color = "red";
+                changeMsg.innerText = "Vui lòng nhập đầy đủ mật khẩu cũ và mới!";
+                return;
+            }
+
+            changeMsg.style.color = "blue";
+            changeMsg.innerText = "Đang kiểm tra và cập nhật...";
+
+            // Bước A: Đăng nhập thử bằng pass cũ để kiểm tra xem có đúng là chủ shop không
+            firebase.auth().signInWithEmailAndPassword(emailAdmin, oldPass)
+            .then((userCredential) => {
+                const user = firebase.auth().currentUser;
+                
+                // Bước B: Khi đã xác thực đúng pass cũ, tiến hành ghi đè pass mới lên Firebase
+                user.updatePassword(newPass).then(() => {
+                    changeMsg.style.color = "green";
+                    changeMsg.innerText = "Đổi mật khẩu thành công! Hãy quay lại đăng nhập bằng mật khẩu mới.";
+                    
+                    // Reset các ô nhập liệu
+                    document.getElementById('oldPass').value = '';
+                    document.getElementById('newPass').value = '';
+                }).catch((error) => {
+                    changeMsg.style.color = "red";
+                    changeMsg.innerText = "Lỗi Firebase: Mật khẩu mới phải từ 6 ký tự trở lên.";
+                });
+            })
+            .catch((error) => {
+                // Nếu đăng nhập bằng mật khẩu cũ thất bại
+                changeMsg.style.color = "red";
+                changeMsg.innerText = "Mật khẩu CŨ không chính xác!";
+            });
+        }
+    </script>
+</body>
+</html>
