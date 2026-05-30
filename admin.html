@@ -92,6 +92,11 @@ body {
   padding: 6px 12px;
   cursor: pointer;
 }
+.page-btn:disabled {
+  background: #eee;
+  cursor: not-allowed;
+  color: #aaa;
+}
 .fb-item {
   padding: 10px;
   border-bottom: 1px solid #ddd;
@@ -122,7 +127,7 @@ body {
 
 <button id="toggleFeedback" class="toggle-btn" style="background: #fff3cd; border-color: #ffeeba;">Hiện danh sách ý kiến khách hàng</button>
 <div id="feedbackWrapper" style="display:none; margin-top: 15px;">
-  <h2>Ý kiến khách hàng</h2>
+  <h2>Ý kiến khách hàng (Tất cả các ngày)</h2>
   <div id="feedbackList"></div>
   <div class="pagination">
     <button id="prevPage" class="page-btn">◄ Trang trước</button>
@@ -157,7 +162,9 @@ const today = new Date().toISOString().split('T')[0];
 
 const waitingRef = db.ref(`queues/${today}/${currentStore}/waiting`);
 const servedRef = db.ref(`queues/${today}/${currentStore}/served`);
-const feedbackRef = db.ref(`feedbacks/${today}/${currentStore}`);
+
+// ĐÃ THAY ĐỔI: Bỏ cấu trúc nhóm theo ${today} để lấy toàn bộ ý kiến phẳng của chi nhánh này
+const feedbackRef = db.ref(`feedbacks/${currentStore}`);
 
 // Khởi tạo các nút cửa hàng
 const storeButtons = document.getElementById('storeButtons');
@@ -239,13 +246,19 @@ servedRef.on('value', snapshot => {
 // Biến quản lý Phân trang cho phần Ý kiến khách hàng
 let allFeedbacks = [];
 let currentPage = 1;
-const itemsPerPage = 20;
 
-// Lắng nghe dữ liệu ý kiến khách hàng realtime
+// ĐÃ THAY ĐỔI: Chuyển cấu hình phân trang thành 25 cái / 1 trang
+const itemsPerPage = 25;
+
+// Lắng nghe dữ liệu ý kiến khách hàng realtime toàn thời gian
 feedbackRef.on('value', snapshot => {
   const data = snapshot.val() || {};
-  // Sắp xếp ý kiến từ mới nhất đến cũ nhất
-  allFeedbacks = Object.entries(data).sort((a, b) => b[1].createdAt - a[1].createdAt);
+  // Sắp xếp ý kiến từ mới nhất đến cũ nhất dựa trên thời gian createdAt
+  allFeedbacks = Object.entries(data).sort((a, b) => {
+    const timeA = a[1].createdAt || 0;
+    const timeB = b[1].createdAt || 0;
+    return timeB - timeA;
+  });
   renderFeedbackPage();
 });
 
@@ -261,7 +274,7 @@ function renderFeedbackPage() {
   const pageItems = allFeedbacks.slice(startIndex, endIndex);
 
   if (pageItems.length === 0) {
-    div.innerHTML = '<p style="color:#666; font-style:italic;">Chưa có ý kiến nào trong ngày hôm nay.</p>';
+    div.innerHTML = '<p style="color:#666; font-style:italic;">Chưa có ý kiến khách hàng nào trong hệ thống.</p>';
   }
 
   pageItems.forEach(([id, item]) => {
@@ -274,10 +287,13 @@ function renderFeedbackPage() {
       senderInfo = `${prefix} ${item.name || 'Khách'}`.trim() + (item.phone ? ` (${item.phone})` : '');
     }
 
+    // Kiểm tra định dạng thời gian hợp lệ
+    const displayTime = item.createdAt ? formatTime(item.createdAt) : "Không rõ thời gian";
+
     fbDiv.innerHTML = `
       <div style="font-weight: bold; color: #333;">${senderInfo}:</div>
-      <div style="margin: 5px 0; color: #111;">${item.content}</div>
-      <div class="fb-time">Gửi lúc: ${formatTime(item.createdAt)}</div>
+      <div style="margin: 5px 0; color: #111;">${item.content || ''}</div>
+      <div class="fb-time">Gửi lúc: ${displayTime}</div>
     `;
     div.appendChild(fbDiv);
   });
