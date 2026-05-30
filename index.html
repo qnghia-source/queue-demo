@@ -447,7 +447,7 @@ document.getElementById('submitFeedbackBtn').addEventListener('click', async () 
   const finalPhone = customerSubmittedPhone || phoneInput.value.trim() || "";
   const finalGender = selectedGender || "";
 
-  const activeFeedbackRef = db.ref(`feedbacks/${currentStore}`);
+  const activeFeedbackRef = db.ref(`feedbacks/${storeKey}`);
 
   try {
     await activeFeedbackRef.push({
