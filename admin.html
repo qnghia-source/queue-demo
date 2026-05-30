@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+  <script>
+    const session = localStorage.getItem('admin_session');
+    
+    // Nếu không có vé thông hành hoặc vé đã hết hạn 7 ngày
+    if (!session || Date.now() > parseInt(session)) {
+        localStorage.removeItem('admin_session'); // Xóa vé cũ (nếu có)
+        alert("Vui lòng đăng nhập để vào trang quản trị!");
+        window.location.href = 'admin-login.html'; // Đá văng ra trang login
+    }
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Queue Admin - Mì Kung Fu</title>
