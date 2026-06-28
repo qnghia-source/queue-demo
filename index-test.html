@@ -397,3 +397,328 @@
   <div class="bg-decor-success">
     <div class="dua-va-dimsum-box">
       <img src="dua-va-dimsum.png" alt="Đũa và dimsum" />
+    </div>
+  </div>
+
+  <div id="bookingFormWrapper">
+    <div class="gender-selector">
+      <button type="button" class="gender-btn" id="btnAnh" onclick="selectGender('Anh')">
+        <img src="panda-icon.png" class="avatar-icon" alt="Nam" />
+        <span id="textAnh">Anh</span>
+        <img src="gender-notpicked.png" id="iconAnh" class="status-icon" alt="status" />
+      </button>
+      <button type="button" class="gender-btn" id="btnChi" onclick="selectGender('Chị')">
+        <img src="panda-icon-f.png" class="avatar-icon" alt="Nữ" />
+        <span id="textChi">Chị</span>
+        <img src="gender-notpicked.png" id="iconChi" class="status-icon" alt="status" />
+      </button>
+    </div>
+
+    <div class="input-group">
+      <img src="panda-icon.png" class="input-icon" alt="User" />
+      <input type="text" id="name" placeholder="Tên của bạn" />
+    </div>
+
+    <div class="input-group">
+      <img src="panda-icon-3.png" class="input-icon" alt="Guests" />
+      <input type="number" id="guestCount" placeholder="Số lượng khách" />
+    </div>
+
+    <div class="input-group">
+      <img src="icon-phone.png" class="input-icon" alt="Phone" />
+      <input type="tel" id="phone" placeholder="Số điện thoại" />
+    </div>
+    
+    <button id="submitBtn" class="main-btn" disabled>Đặt bàn</button>
+  </div>
+
+  <div id="successMessage" style="display: none;" class="success-box">
+    <div class="success-title-flex">
+      <img src="gender-picked.png" alt="Success" />
+      <span id="textSuccessTitle">CẢM ƠN BẠN ĐÃ ĐẶT HÀNG</span>
+    </div>
+    
+    <div class="success-columns">
+      <div class="success-col">
+        <img src="panda-icon.png" alt="User" />
+        <span id="colNameVal">-</span>
+      </div>
+      <div class="success-col">
+        <img src="panda-icon-3.png" alt="Guests" />
+        <span id="colCountVal">- khách</span>
+      </div>
+      <div class="success-col">
+        <img src="icon-phone.png" alt="Phone" />
+        <span id="colPhoneVal">-</span>
+      </div>
+    </div>
+    
+    <div id="successNotice" class="success-notice"></div>
+  </div>
+
+  <a class="menu-link-large" id="btnMenuLarge" href="https://m.me/110354707866871?ref=.f.af475c640ccd4ab49bce4414c91603bf" target="_blank">
+    <img src="icon-menu.png" alt="Menu Icon" />
+    <span>MENU</span>
+  </a>
+
+  <div class="feedback-section" id="feedbackSectionWrapper" style="display: none;">
+    <input type="text" value="Ý KIẾN KHÁCH HÀNG" id="textFeedbackTitle" style="background:transparent; padding:0; font-weight:700; font-size:14px; color:#f4f2e5; height:auto; border:none; outline:none;" disabled />
+    <div class="input-group">
+      <textarea id="feedbackContent" rows="3" placeholder="Nhập ý kiến đóng góp của bạn tại đây..."></textarea>
+    </div>
+    <button id="submitFeedbackBtn" class="main-btn">Gửi ý kiến</button>
+  </div>
+
+  <div class="bottom-decor-area">
+    
+    <div class="bg-decor-order">
+      <div class="panda-bow-box">
+        <img src="panda-bow.png" alt="Panda ôm bát mì" />
+        <div class="wifi-info-overlay">
+          wifi: MIKUNGFU<br>Pass: 12346789
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-decor-success">
+      <div class="panda-dimsum-box">
+        <img src="panda-dimsum.png" alt="Panda và xửng dimsum" />
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+// Giữ nguyên 100% cấu hình & Logic xử lý dữ liệu Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyD_hZDfeIR575b7n5Cshp1VRZg2y--raiw",
+  authDomain: "mykungfu-31485.firebaseapp.com",
+  databaseURL: "https://mykungfu-31485-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "mykungfu-31485",
+  storageBucket: "mykungfu-31485.firebasestorage.app",
+  messagingSenderId: "830853417821",
+  appId: "1:830853417821:web:f336fb6f4cc7660b7d36b4"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const storesConfig = {
+  kungfu: { name: 'Mì Kung Fu', address: '124B Đường 2/9' },
+  kungfu2: { name: 'Mì Kung Fu', address: '225 Đường Nguyễn Văn Thoại' }
+};
+
+const dictionary = {
+  vi: {
+    placeholderName: "Tên của bạn",
+    placeholderGuest: "Số lượng khách",
+    placeholderPhone: "Số điện thoại",
+    btnSubmit: "ĐẶT BÀN",
+    successTitle: "CẢM ƠN BẠN ĐÃ ĐẶT HÀNG",
+    btnMenu: "MENU",
+    feedbackTitle: "Ý KIẾN KHÁCH HÀNG",
+    placeholderFeedback: "Nhập ý kiến đóng góp của bạn tại đây...",
+    btnFeedback: "GỬI Ý KIẾN",
+    titleAnh: "Anh",
+    titleChi: "Chị",
+    alertFeedbackEmpty: "Vui lòng nhập nội dung ý kiến trước khi gửi!",
+    alertFeedbackSuccess: "Gửi ý kiến đóng góp thành công. Cảm ơn bạn!",
+    alertFeedbackError: "Không thể gửi ý kiến lúc này. Vui lòng thử lại!",
+    alertBookingError: "Đã xảy ra lỗi kết nối mạng. Vui lòng thử lại!",
+    labelGuests: "khách",
+    labelPhone: "SĐT",
+    noticeLines: "KHI ĐẾN LƯỢT NHÂN VIÊN SẼ<br>MỜI QUÝ KHÁCH VÀO BÀN"
+  },
+  en: {
+    placeholderName: "Your Name",
+    placeholderGuest: "Number of Guests",
+    placeholderPhone: "Phone Number",
+    btnSubmit: "BOOK A TABLE",
+    successTitle: "THANK YOU FOR YOUR ORDER",
+    btnMenu: "MENU",
+    feedbackTitle: "CUSTOMER FEEDBACK",
+    placeholderFeedback: "Enter your feedback or suggestions here...",
+    btnFeedback: "SUBMIT FEEDBACK",
+    titleAnh: "Mr.",
+    titleChi: "Ms.",
+    alertFeedbackEmpty: "Please enter your feedback before submitting!",
+    alertFeedbackSuccess: "Feedback submitted successfully. Thank you!",
+    alertFeedbackError: "Could not submit feedback at this time. Please try again!",
+    alertBookingError: "Network connection error. Please try again!",
+    labelGuests: "guests",
+    labelPhone: "Phone",
+    noticeLines: "OUR STAFF WILL INVITE YOU IN<br>WHEN IT IS YOUR TURN"
+  }
+};
+
+let currentLang = localStorage.getItem('kungfu_lang') || 'vi';
+
+let params = new URLSearchParams(window.location.search);
+let storeKey = params.get('store');
+
+if (!storeKey || !storesConfig[storeKey]) {
+  storeKey = 'kungfu';
+  const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?store=kungfu';
+  window.history.replaceState({ path: newUrl }, '', newUrl);
+}
+
+const currentStore = storesConfig[storeKey];
+document.getElementById('storeAddress').innerText = currentStore.address;
+
+const d = new Date();
+const tzOffset = 7 * 60 * 60 * 1000;
+const localDate = new Date(d.getTime() + tzOffset);
+const today = localDate.toISOString().split('T')[0];
+
+let selectedGender = '';
+let customerSubmittedName = '';
+let customerSubmittedPhone = '';
+
+function switchLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('kungfu_lang', lang);
+  
+  document.getElementById('lang-vi').classList.toggle('active', lang === 'vi');
+  document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+  
+  const langData = dictionary[lang];
+  document.getElementById('name').placeholder = langData.placeholderName;
+  document.getElementById('guestCount').placeholder = langData.placeholderGuest;
+  document.getElementById('phone').placeholder = langData.placeholderPhone;
+  document.getElementById('submitBtn').innerText = langData.btnSubmit;
+  document.getElementById('textSuccessTitle').innerText = langData.successTitle;
+  document.getElementById('btnMenuLarge').querySelector('span').innerText = langData.btnMenu;
+  document.getElementById('textFeedbackTitle').value = langData.feedbackTitle;
+  document.getElementById('feedbackContent').placeholder = langData.placeholderFeedback;
+  document.getElementById('submitFeedbackBtn').innerText = langData.btnFeedback;
+  document.getElementById('textAnh').innerText = langData.titleAnh;
+  document.getElementById('textChi').innerText = langData.titleChi;
+  
+  document.getElementById('successNotice').innerHTML = langData.noticeLines;
+  
+  if (customerSubmittedName) {
+    updateSuccessBoxDisplay();
+  }
+}
+
+function selectGender(gender) {
+  selectedGender = gender;
+  const btnAnh = document.getElementById('btnAnh');
+  const btnChi = document.getElementById('btnChi');
+  const iconAnh = document.getElementById('iconAnh');
+  const iconChi = document.getElementById('iconChi');
+
+  if (gender === 'Anh') {
+    btnAnh.style.backgroundColor = '#f4f2e5'; 
+    btnChi.style.backgroundColor = 'rgba(244, 242, 229, 0.4)'; 
+    iconAnh.src = 'gender-picked.png';
+    iconChi.src = 'gender-notpicked.png';
+  } else {
+    btnChi.style.backgroundColor = '#f4f2e5';
+    btnAnh.style.backgroundColor = 'rgba(244, 242, 229, 0.4)'; 
+    iconChi.src = 'gender-picked.png';
+    iconAnh.src = 'gender-notpicked.png';
+  }
+  checkForm();
+}
+
+const nameInput = document.getElementById('name');
+const guestCountInput = document.getElementById('guestCount');
+const phoneInput = document.getElementById('phone');
+const submitBtn = document.getElementById('submitBtn');
+
+function checkForm() {
+  submitBtn.disabled = !(
+    selectedGender &&
+    nameInput.value.trim() &&
+    guestCountInput.value.trim() &&
+    phoneInput.value.trim()
+  );
+}
+
+nameInput.addEventListener('input', checkForm);
+guestCountInput.addEventListener('input', checkForm);
+phoneInput.addEventListener('input', checkForm);
+
+function updateSuccessBoxDisplay() {
+  const langData = dictionary[currentLang];
+  const translatedGender = selectedGender === 'Anh' ? langData.titleAnh : langData.titleChi;
+  const guestCount = document.getElementById('guestCount').value.trim();
+  
+  document.getElementById('colNameVal').innerText = `${translatedGender} ${customerSubmittedName}`;
+  document.getElementById('colCountVal').innerText = `${guestCount} ${langData.labelGuests}`;
+  document.getElementById('colPhoneVal').innerText = customerSubmittedPhone;
+}
+
+submitBtn.addEventListener('click', async () => {
+  const name = nameInput.value.trim();
+  const guestCount = guestCountInput.value.trim();
+  const phone = phoneInput.value.trim();
+  const timestamp = Date.now();
+
+  customerSubmittedName = name;
+  customerSubmittedPhone = phone;
+
+  const activeWaitingRef = db.ref(`queues/${today}/${storeKey}/waiting`);
+
+  try {
+    await activeWaitingRef.push({
+      gender: selectedGender,
+      name,
+      guestCount,
+      phone,
+      createdAt: timestamp
+    });
+
+    document.getElementById('bookingFormWrapper').style.display = 'none';
+    updateSuccessBoxDisplay();
+    
+    document.getElementById('successMessage').style.display = 'block';
+    document.getElementById('feedbackSectionWrapper').style.display = 'block';
+    
+    const container = document.getElementById('mainAppContainer');
+    container.classList.remove('order-view');
+    container.classList.add('success-view');
+
+  } catch (error) {
+    console.error("Lỗi:", error);
+    alert(dictionary[currentLang].alertBookingError);
+  }
+});
+
+document.getElementById('submitFeedbackBtn').addEventListener('click', async () => {
+  const content = document.getElementById('feedbackContent').value.trim();
+  if (!content) {
+    alert(dictionary[currentLang].alertFeedbackEmpty);
+    return;
+  }
+
+  const finalName = customerSubmittedName || nameInput.value.trim() || "";
+  const finalPhone = customerSubmittedPhone || phoneInput.value.trim() || "";
+  const finalGender = selectedGender || "";
+
+  const activeFeedbackRef = db.ref(`feedbacks/${currentStore}`);
+
+  try {
+    await activeFeedbackRef.push({
+      gender: finalGender,
+      name: finalName,
+      phone: finalPhone,
+      content: content,
+      createdAt: Date.now()
+    });
+
+    alert(dictionary[currentLang].alertFeedbackSuccess);
+    document.getElementById('feedbackContent').value = '';
+  } catch (error) {
+    console.error("Lỗi:", error);
+    alert(dictionary[currentLang].alertFeedbackError);
+  }
+});
+
+switchLanguage(currentLang);
+</script>
+</body>
+</html>
