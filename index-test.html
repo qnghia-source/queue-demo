@@ -12,7 +12,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   
   <style>
-    /* Toàn bộ cấu hình CSS Reset & Layout an toàn */
+    /* Reset & Khóa Layout */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -21,8 +21,8 @@
     
     body {
       font-family: 'Montserrat', sans-serif;
-      font-weight: 500; /* Montserrat Medium */
-      background-color: #821111; /* Màu đỏ nền thương hiệu */
+      font-weight: 500;
+      background-color: #821111;
       color: #333;
       display: flex;
       justify-content: center;
@@ -30,12 +30,11 @@
       min-height: 100vh;
     }
 
-    /* Container khóa cứng chiều ngang tối đa an toàn */
     .app-container {
       width: 100%;
-      max-width: 430px; /* Chuẩn thông dụng iPhone */
+      max-width: 430px;
       min-height: 100vh;
-      background-image: url('bg-chinese.png'); /* 3 chữ tiếng Trung nền chìm */
+      background-image: url('bg-chinese.png');
       background-position: center top;
       background-repeat: no-repeat;
       background-size: cover;
@@ -46,13 +45,13 @@
       overflow-x: hidden;
     }
 
-    /* Trạng thái đổi hình trang trí khi thành công */
+    /* Đổi trạng thái View */
     .app-container.order-view .bg-decor-order { display: block; }
     .app-container.order-view .bg-decor-success { display: none; }
     .app-container.success-view .bg-decor-order { display: none; }
     .app-container.success-view .bg-decor-success { display: block; }
 
-    /* Bộ chuyển đổi ngôn ngữ */
+    /* Lang Switcher */
     .lang-switcher {
       position: absolute;
       top: 20px;
@@ -75,11 +74,13 @@
       transform: scale(1.15);
     }
 
-    /* Header thương hiệu */
+    /* Header */
     .store-header {
       text-align: center;
       margin-top: 15px;
       margin-bottom: 2px;
+      position: relative;
+      z-index: 1;
     }
     .store-title-img {
       width: 100%;
@@ -89,79 +90,57 @@
     }
     .address {
       text-align: center;
-      color: #f4f2e5; /* Chữ địa chỉ tiệp màu kem nhạt nổi bật trên nền đỏ */
+      color: #f4f2e5;
       font-size: 14px;
       margin-bottom: 5px;
       font-weight: 500;
+      position: relative;
+      z-index: 1;
     }
 
-    /* --- LAYOUT TRANG TRÍ HOẠ TIẾT LỚP TRÊN --- */
+    /* ================= GIẢI PHÁP 1: KHỐI LIÊN KẾT ĐŨA MÌ VÀ NÚT GIỚI TÍNH ================= */
+    .top-sticky-wrapper {
+      position: relative;
+      width: 100%;
+      /* Tạo khoảng trống phía trên vừa đủ để đũa mì tràn lên đè logo mà không đẩy form xuống */
+      padding-top: 65px; 
+      margin-top: -30px;
+      z-index: 5;
+    }
     
-    /* Trang Đặt Bàn: Đũa và mì */
     .dua-va-mi-box {
-      width: calc(100% + 48px); /* Tràn lề phải */
-      margin-left: -24px; /* Căn lề trái */
-      padding-left: 45px; /* Cách lề trái xa hơn các khối khác */
-      margin-bottom: -15px;
-      margin-top: 5px;
+      position: absolute;
+      top: 0;
+      left: -24px; /* Tràn sát viền trái màn hình */
+      width: calc(100% + 48px); /* Tràn sát viền phải màn hình */
+      padding-left: 45px; /* Thụt lề đũa theo thiết kế */
+      pointer-events: none;
     }
     .dua-va-mi-box img {
       width: 100%;
       display: block;
     }
 
-    /* Trang Thành Công: Đũa và dimsum */
+    /* Đũa gắp Dimsum trang thành công */
     .dua-va-dimsum-box {
-      width: 75%; /* CHỈNH SỬA: Cho nhỏ đũa gắp lại */
-      margin-left: -15%; /* CHỈNH SỬA: Dịch hẳn sang lề trái 25% (từ -48px ban đầu dịch thêm sang trái) */
-      margin-top: -10px;
-      margin-bottom: -45px; /* Để khối Cảm ơn đè lên miếng dimsum */
+      width: 72%; /* Thu nhỏ đũa lại tránh quá to */
+      margin-left: -22%; /* Kéo lệch hẳn sang lề trái 22% để dimsum vào giữa */
+      margin-top: -15px;
+      margin-bottom: -35px;
       position: relative;
-      z-index: 1;
+      z-index: 2;
     }
     .dua-va-dimsum-box img {
       width: 100%;
       display: block;
     }
 
-    /* --- CÁC THÀNH PHẦN INPUT & KHỐI CHỨC NĂNG --- */
-    
-    .input-group {
-      position: relative;
-      width: 100%;
-      margin-top: 12px;
-      z-index: 2;
-    }
-    .input-icon {
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 22px;
-      height: 22px;
-      object-fit: contain;
-    }
-    
-    input, textarea {
-      width: 100%;
-      padding: 12px 16px 12px 46px; /* Nhường chỗ cho icon bên trái */
-      border-radius: 12px;
-      border: none;
-      background-color: #f4f2e5; /* Màu be kem nhạt thiết kế */
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 500;
-      font-size: 14px;
-      color: #333;
-      outline: none;
-    }
-    
-    /* Custom lại giới tính Anh/Chị dạng dính liền sợi mì */
+    /* Giới tính nút Anh / Chị luôn khớp chân mì */
     .gender-selector {
       display: flex;
       gap: 12px;
-      margin-top: 0px;
       position: relative;
-      z-index: 3;
+      z-index: 6;
     }
     .gender-btn {
       flex: 1;
@@ -185,30 +164,58 @@
       object-fit: contain;
     }
     .gender-btn .status-icon {
-      margin-left: auto; /* Đẩy icon check về bên phải */
+      margin-left: auto;
       width: 18px;
       height: 18px;
       object-fit: contain;
     }
 
-    /* --- NÚT BẤM CỦA HỆ THỐNG (CSS THUẦN BIẾN ĐỔI THÔNG MINH) --- */
+    /* Input gõ thông tin */
+    .input-group {
+      position: relative;
+      width: 100%;
+      margin-top: 12px;
+      z-index: 5;
+    }
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+    }
     
+    input, textarea {
+      width: 100%;
+      padding: 12px 16px 12px 46px;
+      border-radius: 12px;
+      border: none;
+      background-color: #f4f2e5;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 500;
+      font-size: 14px;
+      color: #333;
+      outline: none;
+    }
+
+    /* Hệ thống nút bấm chính */
     button.main-btn {
       width: 100%;
       padding: 14px;
       margin-top: 15px;
-      border: 2px solid #f4f2e5; /* Đường viền be kem nhạt */
-      border-radius: 15px; /* Bo góc mềm mại */
-      background: #510609; /* CHỈNH SỬA: Đổi màu thành đỏ thẫm cố định, bỏ rgba xuyên thấu gây nhờ mầu */
+      border: 2px solid #f4f2e5;
+      border-radius: 15px;
+      background: #510609; /* Màu đỏ thẫm chuẩn không bị nhờ nhờ mầu */
       color: #f4f2e5;
       font-family: 'Montserrat', sans-serif;
-      font-weight: 700; /* Montserrat Bold */
+      font-weight: 700;
       font-size: 18px;
       letter-spacing: 1px;
       cursor: pointer;
-      z-index: 2;
+      z-index: 5;
       position: relative;
-      transition: background 0.2s;
     }
     button.main-btn:disabled {
       background: rgba(120, 120, 120, 0.6);
@@ -217,17 +224,17 @@
       cursor: not-allowed;
     }
 
-    /* CHỈNH SỬA: Thêm class riêng cho nút Gửi ý kiến để tạo độ trong suốt mờ ảo nhìn xuyên nền */
+    /* Nút gửi ý kiến có độ trong suốt xuyên thấu nền */
     button#submitFeedbackBtn {
-      background: rgba(81, 6, 9, 0.65) !important; /* Đỏ thẫm kết hợp opacity nhìn xuyên background */
+      background: rgba(81, 6, 9, 0.65) !important;
     }
 
-    /* Nút xem Menu lớn */
+    /* Nút xem Menu kích thước lớn */
     .menu-link-large {
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 15px 0 5px 0;
+      margin: 15px 0 0 0; /* Bỏ margin-bottom để dính liền khối gấu dưới */
       text-decoration: none;
       background-color: #f4f2e5;
       color: #333;
@@ -236,10 +243,10 @@
       font-size: 16px;
       font-weight: 700;
       width: 100%;
-      z-index: 2;
+      z-index: 5;
       position: relative;
     }
-    /* CHỈNH SỬA: Đặt icon menu ra góc ngoài cùng bên trái */
+    /* Đẩy icon menu văng ra góc ngoài cùng bên trái */
     .menu-link-large img {
       position: absolute;
       left: 16px;
@@ -247,36 +254,19 @@
       height: 20px;
       object-fit: contain;
     }
-    /* CHỈNH SỬA: Giữ chữ MENU căn giữa tuyệt đối */
+    /* Giữ chữ MENU căn giữa tuyệt đối */
     .menu-link-large span {
       margin: 0 auto;
     }
 
-    /* Khối chữ tiếng trung nhỏ trang trí */
-    .chinese-decor-wrap {
-      width: 100%;
-      margin-top: 4px;
-      margin-bottom: 5px;
-      display: flex;
-      z-index: 2;
-      position: relative;
-    }
-    .chinese-decor-wrap img {
-      height: 45px;
-      object-fit: contain;
-    }
-    /* Vị trí chữ Trung Quốc nhỏ ở 2 trang */
-    .app-container.order-view .chinese-decor-wrap { justify-content: flex-end; padding-right: 15px; }
-    .app-container.success-view .chinese-decor-wrap { justify-content: flex-start; padding-left: 15px; margin-top: 8px; }
-
-    /* Khối thành công đè lên Dimsum */
+    /* Khối kết quả thành công 3 cột */
     .success-box {
       background-color: #f4f2e5;
       padding: 16px;
       border-radius: 16px;
       margin-top: 0px;
       position: relative;
-      z-index: 2;
+      z-index: 5;
       width: 100%;
     }
     .success-title-flex {
@@ -294,7 +284,6 @@
       width: 18px;
       height: 18px;
     }
-    /* Cấu trúc 3 cột thông tin sạch sẽ */
     .success-columns {
       display: flex;
       border-bottom: 1px solid rgba(0,0,0,0.1);
@@ -334,69 +323,32 @@
       color: #666;
     }
 
-    /* Khu vực Ý kiến khách hàng */
+    /* Form ý kiến đóng góp */
     .feedback-section {
       width: 100%;
-      margin-top: 0px;
-      z-index: 2;
+      margin-top: 15px;
+      z-index: 5;
       position: relative;
     }
     .feedback-section .input-group {
       margin-top: 5px;
     }
     .feedback-section textarea {
-      padding: 12px 16px; /* Ý kiến khách hàng không có icon trái */
+      padding: 12px 16px;
       height: 75px;
       resize: none;
     }
 
-    /* ĐÁY MÀN HÌNH - KHU VỰC ĐẤM ĐUỐI TRANG TRÍ CỦA PANDA VÀ WIFI */
-    .bottom-decor-area {
-      margin-top: auto; /* Đẩy sát xuống đáy container */
-      position: relative;
+    /* ================= GIẢI PHÁP 2: KHỐI ĐÁY DÍNH LIỀN SAU NÚT CỐ ĐỊNH ================= */
+    .bottom-attached-container {
       width: calc(100% + 48px);
       margin-left: -24px;
+      margin-top: -4px; /* Ép nhẹ hít chặt lên viền đáy của nút phía trên */
       z-index: 1;
-    }
-    
-    /* CHỈNH SỬA: Sửa phần đũa mì/bát gấu trang đặt bàn dính khít viền dưới nút MENU */
-    .app-container.order-view .bottom-decor-area {
-      margin-top: -10px; /* CHỈNH SỬA: Kéo ngược khối đáy dính sát vào viền nút Menu trên */
-    }
-    .panda-bow-box {
-      width: 100%;
-      display: flex;
-      justify-content: flex-start;
-      align-items: flex-end;
       position: relative;
     }
-    .panda-bow-box img {
-      width: 100%; /* CHỈNH SỬA: Cho ảnh giãn hết 100% chiều ngang như yêu cầu */
-      display: block;
-    }
-    /* Khối text Wifi Pass đè lên đúng góc phải cái bát */
-    .wifi-info-overlay {
-      position: absolute;
-      right: 30px;
-      bottom: 22px;
-      color: #333;
-      font-size: 11px;
-      font-weight: 700;
-      line-height: 1.4;
-      text-align: left;
-    }
-
-    /* CHỈNH SỬA: Sửa phần dimsum/gấu trang thành công dính khít viền dưới nút Gửi ý kiến */
-    .app-container.success-view .bottom-decor-area {
-      margin-top: -10px; /* CHỈNH SỬA: Dịch chuyển tịnh tiến sát lên trên viền nút */
-    }
-    .panda-dimsum-box {
-      width: 100%;
-      display: flex;
-      justify-content: flex-end;
-    }
-    .panda-dimsum-box img {
-      width: 100%; /* CHỈNH SỬA: To hết chiều ngang màn hình */
+    .bottom-attached-container img {
+      width: 100%; /* Giãn phủ kín toàn bộ bề ngang như thiết kế mới */
       display: block;
     }
   </style>
@@ -415,12 +367,6 @@
   </div>
   <div id="storeAddress" class="address"></div>
 
-  <div class="bg-decor-order">
-    <div class="dua-va-mi-box">
-      <img src="dua-va-mi.png" alt="Đũa và mì" />
-    </div>
-  </div>
-  
   <div class="bg-decor-success">
     <div class="dua-va-dimsum-box">
       <img src="dua-va-dimsum.png" alt="Đũa và dimsum" />
@@ -428,17 +374,25 @@
   </div>
 
   <div id="bookingFormWrapper">
-    <div class="gender-selector">
-      <button type="button" class="gender-btn" id="btnAnh" onclick="selectGender('Anh')">
-        <img src="panda-icon.png" class="avatar-icon" alt="Nam" />
-        <span id="textAnh">Anh</span>
-        <img src="gender-notpicked.png" id="iconAnh" class="status-icon" alt="status" />
-      </button>
-      <button type="button" class="gender-btn" id="btnChi" onclick="selectGender('Chị')">
-        <img src="panda-icon-f.png" class="avatar-icon" alt="Nữ" />
-        <span id="textChi">Chị</span>
-        <img src="gender-notpicked.png" id="iconChi" class="status-icon" alt="status" />
-      </button>
+    <div class="top-sticky-wrapper">
+      <div class="bg-decor-order">
+        <div class="dua-va-mi-box">
+          <img src="dua-va-mi.png" alt="Đũa và mì" />
+        </div>
+      </div>
+      
+      <div class="gender-selector">
+        <button type="button" class="gender-btn" id="btnAnh" onclick="selectGender('Anh')">
+          <img src="panda-icon.png" class="avatar-icon" alt="Nam" />
+          <span id="textAnh">Anh</span>
+          <img src="gender-notpicked.png" id="iconAnh" class="status-icon" alt="status" />
+        </button>
+        <button type="button" class="gender-btn" id="btnChi" onclick="selectGender('Chị')">
+          <img src="panda-icon-f.png" class="avatar-icon" alt="Nữ" />
+          <span id="textChi">Chị</span>
+          <img src="gender-notpicked.png" id="iconChi" class="status-icon" alt="status" />
+        </button>
+      </div>
     </div>
 
     <div class="input-group">
@@ -488,41 +442,30 @@
     <span>MENU</span>
   </a>
 
-  <div class="chinese-decor-wrap">
-    <img src="icon-chinese.png" alt="Chữ trung quốc nhỏ" />
+  <div class="bg-decor-order">
+    <div class="bottom-attached-container">
+      <img src="panda-bow.png" alt="Panda ôm bát mì và thông tin" />
+    </div>
   </div>
 
   <div class="feedback-section" id="feedbackSectionWrapper" style="display: none;">
-    <input type="text" value="Ý KIẾN KHÁCH HÀNG" id="textFeedbackTitle" style="background:transparent; padding:0; font-weight:700; font-size:14px; color:#f4f2e5; height:auto;" disabled />
+    <input type="text" value="Ý KIẾN KHÁCH HÀNG" id="textFeedbackTitle" style="background:transparent; padding:0; font-weight:700; font-size:14px; color:#f4f2e5; height:auto; border:none; outline:none;" disabled />
     <div class="input-group">
       <textarea id="feedbackContent" rows="3" placeholder="Nhập ý kiến đóng góp của bạn tại đây..."></textarea>
     </div>
     <button id="submitFeedbackBtn" class="main-btn">Gửi ý kiến</button>
   </div>
 
-  <div class="bottom-decor-area">
-    
-    <div class="bg-decor-order">
-      <div class="panda-bow-box">
-        <img src="panda-bow.png" alt="Panda ôm bát mì" />
-        <div class="wifi-info-overlay">
-          wifi: MIKUNGFU<br>Pass: 12346789
-        </div>
-      </div>
+  <div class="bg-decor-success">
+    <div class="bottom-attached-container" style="margin-top: 5px;">
+      <img src="panda-dimsum.jpg" alt="Panda xửng dimsum thành công" />
     </div>
-    
-    <div class="bg-decor-success">
-      <div class="panda-dimsum-box">
-        <img src="panda-dimsum.png" alt="Panda và xửng dimsum" />
-      </div>
-    </div>
-
   </div>
 
 </div>
 
 <script>
-// Giữ nguyên 100% cấu hình & Logic xử lý dữ liệu Firebase
+// Bảo lưu cấu hình và kết nối đồng bộ Realtime Database Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyD_hZDfeIR575b7n5Cshp1VRZg2y--raiw",
   authDomain: "mykungfu-31485.firebaseapp.com",
@@ -643,12 +586,12 @@ function selectGender(gender) {
 
   if (gender === 'Anh') {
     btnAnh.style.backgroundColor = '#f4f2e5';
-    btnChi.style.backgroundColor = 'rgba(244, 242, 229, 0.4)'; // Làm mờ nút không chọn
+    btnChi.style.backgroundColor = 'rgba(244, 242, 229, 0.4)';
     iconAnh.src = 'gender-picked.png';
     iconChi.src = 'gender-notpicked.png';
   } else {
     btnChi.style.backgroundColor = '#f4f2e5';
-    btnAnh.style.backgroundColor = 'rgba(244, 242, 229, 0.4)'; // Làm mờ nút không chọn
+    btnAnh.style.backgroundColor = 'rgba(244, 242, 229, 0.4)';
     iconChi.src = 'gender-picked.png';
     iconAnh.src = 'gender-notpicked.png';
   }
@@ -678,7 +621,6 @@ function updateSuccessBoxDisplay() {
   const translatedGender = selectedGender === 'Anh' ? langData.titleAnh : langData.titleChi;
   const guestCount = document.getElementById('guestCount').value.trim();
   
-  // Ráp thông tin vào cấu trúc 3 cột mới gọn gàng
   document.getElementById('colNameVal').innerText = `${translatedGender} ${customerSubmittedName}`;
   document.getElementById('colCountVal').innerText = `${guestCount} ${langData.labelGuests}`;
   document.getElementById('colPhoneVal').innerText = customerSubmittedPhone;
@@ -704,15 +646,12 @@ submitBtn.addEventListener('click', async () => {
       createdAt: timestamp
     });
 
-    // ẨN FORM ĐẶT BÀN
     document.getElementById('bookingFormWrapper').style.display = 'none';
     updateSuccessBoxDisplay();
     
-    // HIỆN HỘP THÔNG BÁO VÀ KHU VỰC Ý KIẾN KHÁCH HÀNG
     document.getElementById('successMessage').style.display = 'block';
     document.getElementById('feedbackSectionWrapper').style.display = 'block';
     
-    // THAY ĐỔI HÌNH NỀN VÀ ASSET TRANG TRÍ SANG PHẦN THÀNH CÔNG THÔNG MINH
     const container = document.getElementById('mainAppContainer');
     container.classList.remove('order-view');
     container.classList.add('success-view');
