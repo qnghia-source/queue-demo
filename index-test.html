@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Đặt Bàn - Mì Kung Fu</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -98,7 +98,7 @@
       z-index: 1;
     }
 
-    /* ================= TRANG ĐẶT BÀN: ĐŨA VÀ MÌ CHẠM KHÍT NÚT ================= */
+    /* ================= TRANG ĐẶT BÀN: FIX LỖI CROP ĐẦU ĐŨA MÌ ================= */
     .top-sticky-wrapper {
       position: relative;
       width: 100%;
@@ -109,26 +109,25 @@
     
     .dua-va-mi-box {
       position: absolute;
-      top: 0;
+      top: -5px;
       left: 0;
       width: 100%;
-      margin-left: 10%; /* Lùi lề trái 10% giúp không mất đầu đũa bên trái */
+      padding-left: 6%; /* Đẩy nhẹ sang phải vừa đủ để không chạm viền màn hình */
       pointer-events: none;
       height: 110px;
-      overflow: hidden;
     }
     .dua-va-mi-box img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain; /* Đổi sang contain để không bao giờ bị cắt mất viền ảnh */
       display: block;
     }
 
-    /* ================= TRANG THÀNH CÔNG: ĐŨA GẮP DIMSUM ĐẨY CAO LÊN LOGO ================= */
+    /* ================= TRANG THÀNH CÔNG: ĐÃ HẠ THẤP MARGIN THEO YÊU CẦU ================= */
     .dua-va-dimsum-box {
       width: 86%; 
       margin-left: -20%; 
-      margin-top: -150px; /* CHỖ SỬA ĐỂ TỰ ĐIỀU CHỈNH ĐỘ CAO THẤP CỦA DIMSUM TRÊN LOGO */
+      margin-top: -70px; /* Đã sửa thành -70px giúp hạ thấp đũa dimsum xuống dưới logo */
       margin-bottom: -35px;
       position: relative;
       z-index: 2;
@@ -190,15 +189,16 @@
       object-fit: contain;
     }
     
+    /* FIX LỖI AUTO ZOOM: Đưa font-size lên 16px và tinh chỉnh lại padding */
     input, textarea {
       width: 100%;
-      padding: 12px 16px 12px 46px;
+      padding: 10px 16px 10px 46px;
       border-radius: 12px;
       border: none;
       background-color: #f4f2e5;
       font-family: 'Montserrat', sans-serif;
       font-weight: 500;
-      font-size: 14px;
+      font-size: 16px; /* Đúng chuẩn 16px chống tự động phóng màn hình trên iOS */
       color: #333;
       outline: none;
     }
@@ -358,22 +358,26 @@
 
 <div class="app-container order-view" id="mainAppContainer">
   
+  <!-- Lang switcher -->
   <div class="lang-switcher">
     <button class="lang-btn" id="lang-vi" onclick="switchLanguage('vi')" title="Tiếng Việt">🇻🇳</button>
     <button class="lang-btn" id="lang-en" onclick="switchLanguage('en')" title="English">🇬🇧</button>
   </div>
 
+  <!-- Cụm Header cố định -->
   <div class="store-header">
     <img src="logo-mikungfu.png" alt="Mì Kung Fu" class="store-title-img" />
   </div>
   <div id="storeAddress" class="address"></div>
 
+  <!-- Đũa gắp Dimsum -->
   <div class="bg-decor-success">
     <div class="dua-va-dimsum-box">
       <img src="dua-va-dimsum.png" alt="Đũa và dimsum" />
     </div>
   </div>
 
+  <!-- VIEW CHÍNH 1: FORM ĐẶT BÀN -->
   <div id="bookingFormWrapper">
     <div class="top-sticky-wrapper">
       <div class="bg-decor-order">
@@ -414,6 +418,7 @@
     <button id="submitBtn" class="main-btn" disabled>Đặt bàn</button>
   </div>
 
+  <!-- VIEW CHÍNH 2: HỘP THÀNH CÔNG -->
   <div id="successMessage" style="display: none;" class="success-box">
     <div class="success-title-flex">
       <img src="gender-picked.png" alt="Success" />
@@ -438,17 +443,20 @@
     <div id="successNotice" class="success-notice"></div>
   </div>
 
+  <!-- NÚT XEM MENU LỚN -->
   <a class="menu-link-large" id="btnMenuLarge" href="https://m.me/110354707866871?ref=.f.af475c640ccd4ab49bce4414c91603bf" target="_blank">
     <img src="icon-menu.png" alt="Menu Icon" />
     <span>MENU</span>
   </a>
 
+  <!-- Khối dính liền đáy của Trang Đặt Bàn -->
   <div class="bg-decor-order">
     <div class="bottom-attached-container">
       <img src="panda-bow.png" alt="Panda ôm bát mì và thông tin" />
     </div>
   </div>
 
+  <!-- FORM Ý KIẾN KHÁCH HÀNG -->
   <div class="feedback-section" id="feedbackSectionWrapper" style="display: none;">
     <input type="text" value="Ý KIẾN KHÁCH HÀNG" id="textFeedbackTitle" style="background:transparent; padding:0; font-weight:700; font-size:14px; color:#f4f2e5; height:auto; border:none; outline:none;" disabled />
     <div class="input-group">
@@ -457,6 +465,7 @@
     <button id="submitFeedbackBtn" class="main-btn">Gửi ý kiến</button>
   </div>
 
+  <!-- Khối dính liền đáy của Trang Thành Công -->
   <div class="bg-decor-success">
     <div class="bottom-attached-container" style="margin-top: 5px;">
       <img src="panda-dimsum.png" alt="Panda xửng dimsum thành công" />
@@ -651,6 +660,9 @@ submitBtn.addEventListener('click', async () => {
     const container = document.getElementById('mainAppContainer');
     container.classList.remove('order-view');
     container.classList.add('success-view');
+
+    // Tự động cuộn màn hình lên đầu để reset lại view chuẩn sau khi ẩn bàn phím
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
   } catch (error) {
     console.error("Lỗi:", error);
