@@ -2,23 +2,60 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Đặt Bàn - Mì Kung Fu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+  
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 500px;
-      margin: auto;
-      padding: 20px;
-      background: #f5f5f5;
-      position: relative;
+    /* Reset & Khóa Layout */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
+    
+    body {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 500;
+      background-color: #821111;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      background-image: url('bg-chinese.png');
+      background-position: center top;
+      background-repeat: no-repeat;
+      background-size: cover;
+      position: relative;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Đổi trạng thái View */
+    .app-container.order-view .bg-decor-order { display: block; }
+    .app-container.order-view .bg-decor-success { display: none; }
+    .app-container.success-view .bg-decor-order { display: none; }
+    .app-container.success-view .bg-decor-success { display: block; }
+
+    /* Lang Switcher */
     .lang-switcher {
       position: absolute;
       top: 20px;
-      right: 20px;
+      right: 24px;
       display: flex;
       gap: 8px;
       z-index: 10;
@@ -29,219 +66,417 @@
       background: none;
       border: none;
       padding: 0;
-      opacity: 0.5;
+      opacity: 0.4;
       transition: opacity 0.2s, transform 0.2s;
     }
     .lang-btn.active {
       opacity: 1;
       transform: scale(1.15);
     }
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      position: relative;
-    }
+
+    /* Header */
     .store-header {
       text-align: center;
-      margin-bottom: 5px;
-      padding-top: 15px;
+      margin-top: 15px;
+      margin-bottom: 2px;
+      position: relative;
+      z-index: 1;
     }
     .store-title-img {
       width: 100%;
-      max-width: 320px;
+      max-width: 240px;
       height: auto;
       object-fit: contain;
     }
     .address {
       text-align: center;
-      color: #666;
-      font-size: 15.3px;
-      margin-top: 5px;
+      color: #f4f2e5;
+      font-size: 14px;
       margin-bottom: 15px;
-      font-weight: bold;
+      font-weight: 500;
+      position: relative;
+      z-index: 1;
     }
+
+    /* ================= TRANG ĐẶT BÀN: ĐŨA MÌ TO 120% VÀ KHÍT NÚT ================= */
+    .top-sticky-wrapper {
+      position: relative;
+      width: 100%;
+      margin-top: 1px;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .dua-va-mi-box {
+      width: 100%;
+      pointer-events: none;
+      display: flex;
+      justify-content: flex-start;
+    }
+    
+    .dua-va-mi-box img {
+      width: 110%; /* Tăng size lên 120% theo yêu cầu thiết kế */
+      max-width: none;
+      height: auto; /* Để chiều cao tự động co giãn theo tỷ lệ dọc, không ép khung */
+      margin-left: 10%; /* Căn chỉnh lề trái nhẹ nhàng để lộ đầu đũa không bị nuốt */
+      margin-bottom: -1px; /* CHỖ SỬA DỨT ĐIỂM KHOẢNG TRỐNG: Đẩy dịch ảnh xuống đè sát sườn nút */
+      display: block;
+    }
+
+    /* ================= TRANG THÀNH CÔNG: ĐŨA DIMSUM -70PX ================= */
+    .dua-va-dimsum-box {
+      width: 86%;
+      margin-left: -20%;
+      margin-top: -80px; /* Chuẩn -70px thoáng đãng */
+      margin-bottom: -35px;
+      position: relative;
+      z-index: 2;
+    }
+    .dua-va-dimsum-box img {
+      width: 100%;
+      display: block;
+    }
+
+    /* Nút chọn giới tính */
     .gender-selector {
       display: flex;
-      gap: 10px;
-      margin-top: 15px;
+      gap: 12px;
+      position: relative;
+      z-index: 6;
     }
     .gender-btn {
       flex: 1;
-      padding: 10px;
-      border: 1px solid #ccc;
-      background: #fff;
-      border-radius: 8px;
+      padding: 11px 14px;
+      border: none;
+      background-color: #f4f2e5;
+      border-radius: 12px;
       cursor: pointer;
-      font-size: 15px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 500;
+      font-size: 14px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 5px;
+      justify-content: flex-start;
+      gap: 10px;
       color: #333;
     }
-    .gender-btn.selected {
-      background: #28a745;
-      color: white;
-      border-color: #28a745;
+    .gender-btn .avatar-icon {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
     }
+    .gender-btn .status-icon {
+      margin-left: auto;
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+    }
+
+    /* Input gõ thông tin */
+    .input-group {
+      position: relative;
+      width: 100%;
+      margin-top: 12px;
+      z-index: 5;
+    }
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+    }
+    
+    /* Chống Auto Zoom trên iOS */
     input, textarea {
       width: 100%;
-      padding: 12px;
-      margin-top: 12px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
+      padding: 10px 16px 10px 46px;
+      border-radius: 12px;
+      border: none;
+      background-color: #f4f2e5;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 500;
+      font-size: 16px;
+      color: #333;
+      outline: none;
     }
-    textarea {
-      resize: none;
-    }
+
+    /* Hệ thống nút bấm chính */
     button.main-btn {
       width: 100%;
       padding: 14px;
       margin-top: 15px;
-      border: none;
-      border-radius: 8px;
-      background: #ff6600;
-      color: white;
-      font-size: 16px;
+      border: 2px solid #f4f2e5;
+      border-radius: 15px;
+      background: #510609;
+      color: #f4f2e5;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: 1px;
       cursor: pointer;
-      font-weight: bold;
+      z-index: 5;
+      position: relative;
     }
     button.main-btn:disabled {
-      background: gray;
+      background: rgba(120, 120, 120, 0.6);
+      border-color: rgba(244, 242, 229, 0.5);
+      color: rgba(244, 242, 229, 0.6);
       cursor: not-allowed;
     }
-    
-    .success-box {
-      background-color: #79e3cd;
-      color: #174239;
-      padding: 25px 15px;
-      border-radius: 20px;
-      margin-top: 15px;
-      text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .success-title {
-      font-size: 17.5px; /* Giảm nhẹ từ 20px xuống để vừa vặn hoàn hảo trên một dòng di động */
-      font-weight: bold;
-      letter-spacing: 0.5px;
-      margin-bottom: 20px;
-      white-space: nowrap; /* Đảm bảo ép text nằm trên một dòng */
-    }
-    .success-details {
-      font-size: 18px;
-      font-weight: bold;
-      line-height: 1.6;
-    }
-    /* Style cho 2 dòng thông báo bổ sung mới */
-    .success-notice {
-      font-size: 14.5px;
-      font-weight: bold;
-      margin-top: 15px;
-      line-height: 1.5;
-      color: #174239;
+
+    /* Nút gửi ý kiến */
+    button#submitFeedbackBtn {
+      background: rgba(81, 6, 9, 0.65) !important;
     }
 
+    /* Nút xem Menu kích thước lớn */
     .menu-link-large {
-      display: block;
-      margin: 10px 0 20px 0;
-      text-align: center;
-      font-weight: bold;
-      text-decoration: none;
-      background: #007bff;
-      color: white;
-      padding: 14px;
-      border-radius: 8px;
-      font-size: 18px;
-      box-shadow: 0 2px 5px rgba(0,123,255,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 15px 0 0 0;
+        text-decoration: none;
+        background-color: #f4f2e5;
+        color: #333;
+        padding: 13px;
+        border-radius: 12px;
+        width: 100%;
+        z-index: 5;
+        position: relative;
     }
-    
-    .wifi-info {
-      background: #f8f9fa;
-      border: 1px dashed #ccc;
-      border-radius: 8px;
-      padding: 12px;
-      margin-bottom: 10px;
-      font-size: 15px;
-      color: #333;
+    .menu-link-large img {
+      position: absolute;
+      left: 16px;
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
     }
-    .wifi-line {
+    .menu-link-large span {
+        margin: 0 auto;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;         /* Đổi từ 700 (Bold) sang 500 (Medium) theo mẫu */
+        font-size: 19px;          /* Tăng kích thước chữ lớn lên (bản cũ là 16px) */
+        letter-spacing: 4px;      /* Tăng độ giãn cách giữa các chữ cái cho thoáng */
+        text-indent: 4px;         /* Bù lại lề phải để chữ "MENU" nằm chính giữa nút */    }
+
+    /* Khối kết quả thành công 3 cột */
+    .success-box {
+        background-color: #f4f2e5;
+        padding: 16px 10px; /* SỬA TỪ 16px THÀNH 16px 10px: Giảm lề trái/phải từ 16px xuống 10px để hộp rộng hơn */
+        border-radius: 16px;
+        margin-top: 0px;
+        position: relative;
+        z-index: 5;
+        width: 100%;
+    }
+      .success-title-flex {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;                  /* Giảm nhẹ khoảng cách giữa icon và chữ */
+          font-weight: 700;
+          font-size: 12.5px;         /* SỬA TỪ 14px XUỐNG 12.5px: Giúp dòng chữ đủ chỗ duỗi thẳng trên 1 dòng */
+          color: #333;
+          margin-bottom: 12px;
+          text-align: center;
+          white-space: nowrap;       /* THÊM DÒNG NÀY: Ép bắt buộc chữ phải nằm trên 1 dòng, không tự động xuống hàng */
+      }
+    .success-title-flex img {
+      width: 18px;
+      height: 18px;
+    }
+    .success-columns {
       display: flex;
-      justify-content: space-between;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+      padding-bottom: 12px;
+      margin-bottom: 10px;
+    }
+    .success-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #555;
+    }
+    .success-col:not(:last-child) {
+      border-right: 1px solid rgba(0,0,0,0.1);
+    }
+    .success-col img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
       margin-bottom: 4px;
     }
-    .wifi-line:last-child {
-      margin-bottom: 0;
+    .success-col span {
+      color: #000;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+    .success-notice {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.4;
+      color: #666;
     }
 
-    .feedback-title {
-      font-size: 18px;
-      font-weight: bold;
-      margin-top: 25px;
-      border-top: 1px solid #eee;
-      padding-top: 15px;
+    /* Form ý kiến đóng góp */
+    .feedback-section {
+      width: 100%;
+      margin-top: 15px;
+      z-index: 5;
+      position: relative;
+    }
+    .feedback-section .input-group {
+      margin-top: 5px;
+    }
+    .feedback-section textarea {
+      padding: 12px 16px;
+      height: 75px;
+      resize: none;
+    }
+
+    /* Khối đáy dính liền */
+    .bottom-attached-container {
+      width: calc(100% + 48px);
+      margin-left: -24px;
+      margin-top: -4px;
+      z-index: 1;
+      position: relative;
+    }
+    .bottom-attached-container img {
+      width: 100%;
+      display: block;
     }
   </style>
 </head>
 <body>
 
+<div class="app-container order-view" id="mainAppContainer">
+  
+  <!-- Lang switcher -->
   <div class="lang-switcher">
     <button class="lang-btn" id="lang-vi" onclick="switchLanguage('vi')" title="Tiếng Việt">🇻🇳</button>
     <button class="lang-btn" id="lang-en" onclick="switchLanguage('en')" title="English">🇬🇧</button>
   </div>
 
-  <div class="card">
-    <div class="store-header">
-      <img src="logo-mikungfu-title.png" alt="Mì Kung Fu" class="store-title-img" />
-    </div>
-    <div id="storeAddress" class="address"></div>
+  <!-- Cụm Header cố định -->
+  <div class="store-header">
+    <img src="logo-mikungfu.png" alt="Mì Kung Fu" class="store-title-img" />
+  </div>
+  <div id="storeAddress" class="address"></div>
 
-    <div id="bookingFormWrapper">
+  <!-- Đũa gắp Dimsum -->
+  <div class="bg-decor-success">
+    <div class="dua-va-dimsum-box">
+      <img src="dua-va-dimsum.png" alt="Đũa và dimsum" />
+    </div>
+  </div>
+
+  <!-- VIEW CHÍNH 1: FORM ĐẶT BÀN -->
+  <div id="bookingFormWrapper">
+    <div class="top-sticky-wrapper">
+      <div class="bg-decor-order">
+        <div class="dua-va-mi-box">
+          <img src="dua-va-mi.png" alt="Đũa và mì" />
+        </div>
+      </div>
+      
       <div class="gender-selector">
         <button type="button" class="gender-btn" id="btnAnh" onclick="selectGender('Anh')">
-          <span id="iconAnh">○</span> <span id="textAnh">Anh</span>
+          <img src="panda-icon.png" class="avatar-icon" alt="Nam" />
+          <span id="textAnh">Anh</span>
+          <img src="gender-notpicked.png" id="iconAnh" class="status-icon" alt="status" />
         </button>
         <button type="button" class="gender-btn" id="btnChi" onclick="selectGender('Chị')">
-          <span id="iconChi">○</span> <span id="textChi">Chị</span>
+          <img src="panda-icon-f.png" class="avatar-icon" alt="Nữ" />
+          <span id="textChi">Chị</span>
+          <img src="gender-notpicked.png" id="iconChi" class="status-icon" alt="status" />
         </button>
       </div>
+    </div>
 
+    <div class="input-group">
+      <img src="panda-icon.png" class="input-icon" alt="User" />
       <input type="text" id="name" placeholder="Tên của bạn" />
+    </div>
+
+    <div class="input-group">
+      <img src="panda-icon-3.png" class="input-icon" alt="Guests" />
       <input type="number" id="guestCount" placeholder="Số lượng khách" />
+    </div>
+
+    <div class="input-group">
+      <img src="icon-phone.png" class="input-icon" alt="Phone" />
       <input type="tel" id="phone" placeholder="Số điện thoại" />
-      
-      <button id="submitBtn" class="main-btn" disabled>Đặt bàn</button>
     </div>
+    
+    <button id="submitBtn" class="main-btn" disabled>Đặt bàn</button>
+  </div>
 
-    <div id="successMessage" style="display: none;" class="success-box">
-      <div class="success-title" id="textSuccessTitle">BẠN ĐÃ ĐẶT BÀN THÀNH CÔNG</div>
-      <div id="successDetails" class="success-details"></div>
-      <div id="successNotice" class="success-notice"></div>
+  <!-- VIEW CHÍNH 2: HỘP THÀNH CÔNG -->
+  <div id="successMessage" style="display: none;" class="success-box">
+    <div class="success-title-flex">
+      <img src="gender-picked.png" alt="Success" />
+      <span id="textSuccessTitle">CẢM ƠN BẠN ĐÃ ĐẶT BÀN THÀNH CÔNG</span>
+    </div>
+    
+    <div class="success-columns">
+      <div class="success-col">
+        <img src="panda-icon.png" alt="User" />
+        <span id="colNameVal">-</span>
+      </div>
+      <div class="success-col">
+        <img src="panda-icon-3.png" alt="Guests" />
+        <span id="colCountVal">- khách</span>
+      </div>
+      <div class="success-col">
+        <img src="icon-phone.png" alt="Phone" />
+        <span id="colPhoneVal">-</span>
+      </div>
+    </div>
+    
+    <div id="successNotice" class="success-notice"></div>
+  </div>
+
+  <!-- NÚT XEM MENU LỚN -->
+  <a class="menu-link-large" id="btnMenuLarge" href="https://m.me/110354707866871?ref=.f.af475c640ccd4ab49bce4414c91603bf" target="_blank">
+    <img src="icon-menu.png" alt="Menu Icon" />
+    <span>MENU</span>
+  </a>
+
+  <!-- Khối dính liền đáy của Trang Đặt Bàn -->
+  <div class="bg-decor-order">
+    <div class="bottom-attached-container">
+      <img src="panda-bow.png" alt="Panda ôm bát mì và thông tin" />
     </div>
   </div>
 
-  <div class="card">
-    <a class="menu-link-large" id="btnMenuLarge" href="https://m.me/110354707866871?ref=.f.af475c640ccd4ab49bce4414c91603bf" target="_blank">📋 XEM MENU</a>
-
-    <div class="wifi-info">
-      <div class="wifi-line">
-        <span>📶 <strong>WIFI:</strong></span>
-        <span>MI KUNG FU</span>
-      </div>
-      <div class="wifi-line">
-        <span>🔑 <strong>PASS:</strong></span>
-        <span>12346789</span>
-      </div>
+  <!-- FORM Ý KIẾN KHÁCH HÀNG -->
+  <div class="feedback-section" id="feedbackSectionWrapper" style="display: none;">
+    <input type="text" value="Ý KIẾN KHÁCH HÀNG" id="textFeedbackTitle" style="background:transparent; padding:0; font-weight:700; font-size:14px; color:#f4f2e5; height:auto; border:none; outline:none;" disabled />
+    <div class="input-group">
+      <textarea id="feedbackContent" rows="3" placeholder="Nhập ý kiến đóng góp của bạn tại đây..."></textarea>
     </div>
-
-    <div class="feedback-title" id="textFeedbackTitle">Ý Kiến Khách Hàng</div>
-    <textarea id="feedbackContent" rows="3" placeholder="Nhập ý kiến đóng góp của bạn tại đây..."></textarea>
-    <button id="submitFeedbackBtn" class="main-btn" style="background: #6c757d; padding: 10px; margin-top: 10px;">Gửi ý kiến</button>
+    <button id="submitFeedbackBtn" class="main-btn">Gửi ý kiến</button>
   </div>
+
+  <!-- Khối dính liền đáy của Trang Thành Công -->
+  <div class="bg-decor-success">
+    <div class="bottom-attached-container" style="margin-top: 5px;">
+      <img src="panda-dimsum.png" alt="Panda xửng dimsum thành công" />
+    </div>
+  </div>
+
+</div>
 
 <script>
 const firebaseConfig = {
@@ -267,42 +502,40 @@ const dictionary = {
     placeholderName: "Tên của bạn",
     placeholderGuest: "Số lượng khách",
     placeholderPhone: "Số điện thoại",
-    btnSubmit: "Đặt bàn",
-    successTitle: "BẠN ĐÃ ĐẶT BÀN THÀNH CÔNG",
-    btnMenu: "📋 XEM MENU",
-    feedbackTitle: "Ý Kiến Khách Hàng",
+    btnSubmit: "ĐẶT BÀN",
+    successTitle: "CẢM ƠN BẠN ĐÃ ĐẶT BÀN THÀNH CÔNG",
+    btnMenu: "MENU",
+    feedbackTitle: "Ý KIẾN KHÁCH HÀNG",
     placeholderFeedback: "Nhập ý kiến đóng góp của bạn tại đây...",
-    btnFeedback: "Gửi ý kiến",
+    btnFeedback: "GỬI Ý KIẾN",
     titleAnh: "Anh",
     titleChi: "Chị",
     alertFeedbackEmpty: "Vui lòng nhập nội dung ý kiến trước khi gửi!",
     alertFeedbackSuccess: "Gửi ý kiến đóng góp thành công. Cảm ơn bạn!",
     alertFeedbackError: "Không thể gửi ý kiến lúc này. Vui lòng thử lại!",
     alertBookingError: "Đã xảy ra lỗi kết nối mạng. Vui lòng thử lại!",
-    labelGuests: "Khách",
+    labelGuests: "khách",
     labelPhone: "SĐT",
-    // Đoạn dịch bổ sung cho thông báo
     noticeLines: "KHI ĐẾN LƯỢT NHÂN VIÊN SẼ<br>MỜI QUÝ KHÁCH VÀO BÀN"
   },
   en: {
     placeholderName: "Your Name",
     placeholderGuest: "Number of Guests",
     placeholderPhone: "Phone Number",
-    btnSubmit: "Book a Table",
-    successTitle: "BOOKING SUCCESSFUL!",
-    btnMenu: "📋 VIEW MENU",
-    feedbackTitle: "Customer Feedback",
+    btnSubmit: "BOOK A TABLE",
+    successTitle: "THANK YOU FOR YOUR ORDER",
+    btnMenu: "MENU",
+    feedbackTitle: "CUSTOMER FEEDBACK",
     placeholderFeedback: "Enter your feedback or suggestions here...",
-    btnFeedback: "Submit Feedback",
+    btnFeedback: "SUBMIT FEEDBACK",
     titleAnh: "Mr.",
     titleChi: "Ms.",
     alertFeedbackEmpty: "Please enter your feedback before submitting!",
     alertFeedbackSuccess: "Feedback submitted successfully. Thank you!",
     alertFeedbackError: "Could not submit feedback at this time. Please try again!",
     alertBookingError: "Network connection error. Please try again!",
-    labelGuests: "Guests",
+    labelGuests: "guests",
     labelPhone: "Phone",
-    // Đoạn dịch bổ sung cho thông báo bằng tiếng Anh gọn gàng
     noticeLines: "OUR STAFF WILL INVITE YOU IN<br>WHEN IT IS YOUR TURN"
   }
 };
@@ -343,14 +576,13 @@ function switchLanguage(lang) {
   document.getElementById('phone').placeholder = langData.placeholderPhone;
   document.getElementById('submitBtn').innerText = langData.btnSubmit;
   document.getElementById('textSuccessTitle').innerText = langData.successTitle;
-  document.getElementById('btnMenuLarge').innerText = langData.btnMenu;
-  document.getElementById('textFeedbackTitle').innerText = langData.feedbackTitle;
+  document.getElementById('btnMenuLarge').querySelector('span').innerText = langData.btnMenu;
+  document.getElementById('textFeedbackTitle').value = langData.feedbackTitle;
   document.getElementById('feedbackContent').placeholder = langData.placeholderFeedback;
   document.getElementById('submitFeedbackBtn').innerText = langData.btnFeedback;
   document.getElementById('textAnh').innerText = langData.titleAnh;
   document.getElementById('textChi').innerText = langData.titleChi;
   
-  // Luôn cập nhật hoặc chuẩn bị sẵn nội dung thông báo lưu ý theo ngôn ngữ đã chọn
   document.getElementById('successNotice').innerHTML = langData.noticeLines;
   
   if (customerSubmittedName) {
@@ -366,15 +598,11 @@ function selectGender(gender) {
   const iconChi = document.getElementById('iconChi');
 
   if (gender === 'Anh') {
-    btnAnh.classList.add('selected');
-    btnChi.classList.remove('selected');
-    iconAnh.innerText = '●';
-    iconChi.innerText = '○';
+    iconAnh.src = 'gender-picked.png';
+    iconChi.src = 'gender-notpicked.png';
   } else {
-    btnChi.classList.add('selected');
-    btnAnh.classList.remove('selected');
-    iconChi.innerText = '●';
-    iconAnh.innerText = '○';
+    iconChi.src = 'gender-picked.png';
+    iconAnh.src = 'gender-notpicked.png';
   }
   checkForm();
 }
@@ -402,8 +630,9 @@ function updateSuccessBoxDisplay() {
   const translatedGender = selectedGender === 'Anh' ? langData.titleAnh : langData.titleChi;
   const guestCount = document.getElementById('guestCount').value.trim();
   
-  const detailsDiv = document.getElementById('successDetails');
-  detailsDiv.innerHTML = `${translatedGender} ${customerSubmittedName} / ${guestCount} ${langData.labelGuests}<br>${langData.labelPhone} : ${customerSubmittedPhone}`;
+  document.getElementById('colNameVal').innerText = `${translatedGender} ${customerSubmittedName}`;
+  document.getElementById('colCountVal').innerText = `${guestCount} ${langData.labelGuests}`;
+  document.getElementById('colPhoneVal').innerText = customerSubmittedPhone;
 }
 
 submitBtn.addEventListener('click', async () => {
@@ -428,7 +657,16 @@ submitBtn.addEventListener('click', async () => {
 
     document.getElementById('bookingFormWrapper').style.display = 'none';
     updateSuccessBoxDisplay();
+    
     document.getElementById('successMessage').style.display = 'block';
+    document.getElementById('feedbackSectionWrapper').style.display = 'block';
+    
+    const container = document.getElementById('mainAppContainer');
+    container.classList.remove('order-view');
+    container.classList.add('success-view');
+
+    // Tự động cuộn màn hình lên đầu để reset lại view chuẩn sau khi ẩn bàn phím
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
   } catch (error) {
     console.error("Lỗi:", error);
