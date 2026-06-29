@@ -92,40 +92,43 @@
       text-align: center;
       color: #f4f2e5;
       font-size: 14px;
-      margin-bottom: 5px;
+      margin-bottom: 15px; /* Tăng khoảng cách để đẩy cả cụm dưới xuống không chạm logo */
       font-weight: 500;
       position: relative;
       z-index: 1;
     }
 
-    /* ================= GIẢI PHÁP 1: KHỐI LIÊN KẾT ĐŨA MÌ VÀ NÚT GIỚI TÍNH ================= */
+    /* ================= CỤM LIÊN KẾT ĐŨA MÌ VÀ NÚT GIỚI TÍNH TỐI ƯU KHÍT VIỀN ================= */
     .top-sticky-wrapper {
       position: relative;
       width: 100%;
-      /* Tạo khoảng trống phía trên vừa đủ để đũa mì tràn lên đè logo mà không đẩy form xuống */
-      padding-top: 65px; 
-      margin-top: -30px;
+      padding-top: 105px; /* Giữ khoảng trống cố định cho đũa mì hiển thị */
+      margin-top: 0px;
       z-index: 5;
     }
     
     .dua-va-mi-box {
       position: absolute;
       top: 0;
-      left: -24px; /* Tràn sát viền trái màn hình */
-      width: calc(100% + 48px); /* Tràn sát viền phải màn hình */
-      padding-left: 45px; /* Thụt lề đũa theo thiết kế */
+      left: -24px;
+      width: calc(100% + 48px);
+      padding-left: 45px;
       pointer-events: none;
+      height: 110px; /* Khống chế chiều cao chuẩn khớp viền */
+      overflow: hidden;
     }
     .dua-va-mi-box img {
       width: 100%;
+      height: 100%;
+      object-fit: cover; /* Cắt bỏ hoàn toàn khoảng trắng dư bên dưới của ảnh gốc */
       display: block;
     }
 
-    /* Đũa gắp Dimsum trang thành công */
+    /* Đũa gắp Dimsum trang thành công cập nhật theo tỷ lệ mới */
     .dua-va-dimsum-box {
-      width: 72%; /* Thu nhỏ đũa lại tránh quá to */
-      margin-left: -22%; /* Kéo lệch hẳn sang lề trái 22% để dimsum vào giữa */
-      margin-top: -15px;
+      width: 86%; /* Điều chỉnh kích thước 86% như bạn yêu cầu */
+      margin-left: -20%; /* Dịch sang trái -20% giúp dimsum vào đúng trung tâm */
+      margin-top: -10px;
       margin-bottom: -35px;
       position: relative;
       z-index: 2;
@@ -135,7 +138,7 @@
       display: block;
     }
 
-    /* Giới tính nút Anh / Chị luôn khớp chân mì */
+    /* Nút chọn giới tính không bị mờ khi click */
     .gender-selector {
       display: flex;
       gap: 12px;
@@ -207,7 +210,7 @@
       margin-top: 15px;
       border: 2px solid #f4f2e5;
       border-radius: 15px;
-      background: #510609; /* Màu đỏ thẫm chuẩn không bị nhờ nhờ mầu */
+      background: #510609; /* Màu đỏ thẫm cố định chuẩn thiết kế */
       color: #f4f2e5;
       font-family: 'Montserrat', sans-serif;
       font-weight: 700;
@@ -224,7 +227,7 @@
       cursor: not-allowed;
     }
 
-    /* Nút gửi ý kiến có độ trong suốt xuyên thấu nền */
+    /* Nút gửi ý kiến có độ trong suốt nhìn xuyên nền */
     button#submitFeedbackBtn {
       background: rgba(81, 6, 9, 0.65) !important;
     }
@@ -234,7 +237,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 15px 0 0 0; /* Bỏ margin-bottom để dính liền khối gấu dưới */
+      margin: 15px 0 0 0;
       text-decoration: none;
       background-color: #f4f2e5;
       color: #333;
@@ -246,7 +249,6 @@
       z-index: 5;
       position: relative;
     }
-    /* Đẩy icon menu văng ra góc ngoài cùng bên trái */
     .menu-link-large img {
       position: absolute;
       left: 16px;
@@ -254,7 +256,6 @@
       height: 20px;
       object-fit: contain;
     }
-    /* Giữ chữ MENU căn giữa tuyệt đối */
     .menu-link-large span {
       margin: 0 auto;
     }
@@ -339,7 +340,7 @@
       resize: none;
     }
 
-    /* ================= GIẢI PHÁP 2: KHỐI ĐÁY DÍNH LIỀN SAU NÚT CỐ ĐỊNH ================= */
+    /* ================= KHỐI ĐÁY DÍNH LIỀN SAU NÚT CỐ ĐỊNH ================= */
     .bottom-attached-container {
       width: calc(100% + 48px);
       margin-left: -24px;
@@ -348,7 +349,7 @@
       position: relative;
     }
     .bottom-attached-container img {
-      width: 100%; /* Giãn phủ kín toàn bộ bề ngang như thiết kế mới */
+      width: 100%;
       display: block;
     }
   </style>
@@ -458,14 +459,14 @@
 
   <div class="bg-decor-success">
     <div class="bottom-attached-container" style="margin-top: 5px;">
-      <img src="panda-dimsum.jpg" alt="Panda xửng dimsum thành công" />
+      <img src="panda-dimsum.png" alt="Panda xửng dimsum thành công" />
     </div>
   </div>
 
 </div>
 
 <script>
-// Bảo lưu cấu hình và kết nối đồng bộ Realtime Database Firebase
+// Cấu hình & Kết nối Firebase Realtime Database
 const firebaseConfig = {
   apiKey: "AIzaSyD_hZDfeIR575b7n5Cshp1VRZg2y--raiw",
   authDomain: "mykungfu-31485.firebaseapp.com",
@@ -585,13 +586,9 @@ function selectGender(gender) {
   const iconChi = document.getElementById('iconChi');
 
   if (gender === 'Anh') {
-    btnAnh.style.backgroundColor = '#f4f2e5';
-    btnChi.style.backgroundColor = 'rgba(244, 242, 229, 0.4)';
     iconAnh.src = 'gender-picked.png';
     iconChi.src = 'gender-notpicked.png';
   } else {
-    btnChi.style.backgroundColor = '#f4f2e5';
-    btnAnh.style.backgroundColor = 'rgba(244, 242, 229, 0.4)';
     iconChi.src = 'gender-picked.png';
     iconAnh.src = 'gender-notpicked.png';
   }
@@ -673,7 +670,8 @@ document.getElementById('submitFeedbackBtn').addEventListener('click', async () 
   const finalPhone = customerSubmittedPhone || phoneInput.value.trim() || "";
   const finalGender = selectedGender || "";
 
-  const activeFeedbackRef = db.ref(`feedbacks/${currentStore}`);
+  // SỬA LỖI TẠI ĐÂY: Sử dụng chuỗi storeKey thay vì Object currentStore
+  const activeFeedbackRef = db.ref(`feedbacks/${storeKey}`);
 
   try {
     await activeFeedbackRef.push({
