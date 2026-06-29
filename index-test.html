@@ -235,20 +235,18 @@
 
     /* Nút xem Menu kích thước lớn */
     .menu-link-large {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 15px 0 0 0;
-      text-decoration: none;
-      background-color: #f4f2e5;
-      color: #333;
-      padding: 13px;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 700;
-      width: 100%;
-      z-index: 5;
-      position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 15px 0 0 0;
+        text-decoration: none;
+        background-color: #f4f2e5;
+        color: #333;
+        padding: 13px;
+        border-radius: 12px;
+        width: 100%;
+        z-index: 5;
+        position: relative;
     }
     .menu-link-large img {
       position: absolute;
@@ -258,8 +256,12 @@
       object-fit: contain;
     }
     .menu-link-large span {
-      margin: 0 auto;
-    }
+        margin: 0 auto;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 500;         /* Đổi từ 700 (Bold) sang 500 (Medium) theo mẫu */
+        font-size: 19px;          /* Tăng kích thước chữ lớn lên (bản cũ là 16px) */
+        letter-spacing: 4px;      /* Tăng độ giãn cách giữa các chữ cái cho thoáng */
+        text-indent: 4px;         /* Bù lại lề phải để chữ "MENU" nằm chính giữa nút */    }
 
     /* Khối kết quả thành công 3 cột */
     .success-box {
@@ -423,7 +425,7 @@
   <div id="successMessage" style="display: none;" class="success-box">
     <div class="success-title-flex">
       <img src="gender-picked.png" alt="Success" />
-      <span id="textSuccessTitle">CẢM ƠN BẠN ĐÃ ĐẶT HÀNG</span>
+      <span id="textSuccessTitle">CẢM ƠN BẠN ĐÃ ĐẶT BÀN THÀNH CÔNG</span>
     </div>
     
     <div class="success-columns">
@@ -500,7 +502,7 @@ const dictionary = {
     placeholderGuest: "Số lượng khách",
     placeholderPhone: "Số điện thoại",
     btnSubmit: "ĐẶT BÀN",
-    successTitle: "CẢM ƠN BẠN ĐÃ ĐẶT HÀNG",
+    successTitle: "CẢM ƠN BẠN ĐÃ ĐẶT BÀN THÀNH CÔNG",
     btnMenu: "MENU",
     feedbackTitle: "Ý KIẾN KHÁCH HÀNG",
     placeholderFeedback: "Nhập ý kiến đóng góp của bạn tại đây...",
