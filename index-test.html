@@ -265,25 +265,26 @@
 
     /* Khối kết quả thành công 3 cột */
     .success-box {
-      background-color: #f4f2e5;
-      padding: 16px;
-      border-radius: 16px;
-      margin-top: 0px;
-      position: relative;
-      z-index: 5;
-      width: 100%;
+        background-color: #f4f2e5;
+        padding: 16px 10px; /* SỬA TỪ 16px THÀNH 16px 10px: Giảm lề trái/phải từ 16px xuống 10px để hộp rộng hơn */
+        border-radius: 16px;
+        margin-top: 0px;
+        position: relative;
+        z-index: 5;
+        width: 100%;
     }
-    .success-title-flex {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-weight: 700;
-      font-size: 14px;
-      color: #333;
-      margin-bottom: 12px;
-      text-align: center;
-    }
+      .success-title-flex {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;                  /* Giảm nhẹ khoảng cách giữa icon và chữ */
+          font-weight: 700;
+          font-size: 12.5px;         /* SỬA TỪ 14px XUỐNG 12.5px: Giúp dòng chữ đủ chỗ duỗi thẳng trên 1 dòng */
+          color: #333;
+          margin-bottom: 12px;
+          text-align: center;
+          white-space: nowrap;       /* THÊM DÒNG NÀY: Ép bắt buộc chữ phải nằm trên 1 dòng, không tự động xuống hàng */
+      }
     .success-title-flex img {
       width: 18px;
       height: 18px;
