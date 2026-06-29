@@ -98,36 +98,37 @@
       z-index: 1;
     }
 
-    /* ================= TRANG ĐẶT BÀN: FIX LỖI CROP ĐẦU ĐŨA MÌ ================= */
+    /* ================= TRANG ĐẶT BÀN: ĐŨA MÌ TO 120% VÀ KHÍT NÚT ================= */
     .top-sticky-wrapper {
       position: relative;
       width: 100%;
-      padding-top: 105px; 
-      margin-top: 0px;
+      margin-top: 5px;
       z-index: 5;
+      display: flex;
+      flex-direction: column;
     }
     
     .dua-va-mi-box {
-      position: absolute;
-      top: -5px;
-      left: 0;
       width: 100%;
-      padding-left: 6%; /* Đẩy nhẹ sang phải vừa đủ để không chạm viền màn hình */
       pointer-events: none;
-      height: 110px;
+      display: flex;
+      justify-content: flex-start;
     }
+    
     .dua-va-mi-box img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain; /* Đổi sang contain để không bao giờ bị cắt mất viền ảnh */
+      width: 120%; /* Tăng size lên 120% theo yêu cầu thiết kế */
+      max-width: none;
+      height: auto; /* Để chiều cao tự động co giãn theo tỷ lệ dọc, không ép khung */
+      margin-left: -5%; /* Căn chỉnh lề trái nhẹ nhàng để lộ đầu đũa không bị nuốt */
+      margin-bottom: -8px; /* CHỖ SỬA DỨT ĐIỂM KHOẢNG TRỐNG: Đẩy dịch ảnh xuống đè sát sườn nút */
       display: block;
     }
 
-    /* ================= TRANG THÀNH CÔNG: ĐÃ HẠ THẤP MARGIN THEO YÊU CẦU ================= */
+    /* ================= TRANG THÀNH CÔNG: ĐŨA DIMSUM -70PX ================= */
     .dua-va-dimsum-box {
-      width: 86%; 
-      margin-left: -20%; 
-      margin-top: -70px; /* Đã sửa thành -70px giúp hạ thấp đũa dimsum xuống dưới logo */
+      width: 86%;
+      margin-left: -20%;
+      margin-top: -80px; /* Chuẩn -70px thoáng đãng */
       margin-bottom: -35px;
       position: relative;
       z-index: 2;
@@ -189,7 +190,7 @@
       object-fit: contain;
     }
     
-    /* FIX LỖI AUTO ZOOM: Đưa font-size lên 16px và tinh chỉnh lại padding */
+    /* Chống Auto Zoom trên iOS */
     input, textarea {
       width: 100%;
       padding: 10px 16px 10px 46px;
@@ -198,7 +199,7 @@
       background-color: #f4f2e5;
       font-family: 'Montserrat', sans-serif;
       font-weight: 500;
-      font-size: 16px; /* Đúng chuẩn 16px chống tự động phóng màn hình trên iOS */
+      font-size: 16px;
       color: #333;
       outline: none;
     }
@@ -227,7 +228,7 @@
       cursor: not-allowed;
     }
 
-    /* Nút gửi ý kiến có độ trong suốt nhìn xuyên nền */
+    /* Nút gửi ý kiến */
     button#submitFeedbackBtn {
       background: rgba(81, 6, 9, 0.65) !important;
     }
@@ -340,7 +341,7 @@
       resize: none;
     }
 
-    /* Khối đáy dính liền sau nút cố định */
+    /* Khối đáy dính liền */
     .bottom-attached-container {
       width: calc(100% + 48px);
       margin-left: -24px;
